@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 2b - Requirements Elicitation 思维导图</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: #0d0f18;
+    color: #e0e4ef;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .header {
+    text-align: center;
+    padding: 40px 20px 20px;
+    position: relative;
+  }
+
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #d48a4a, transparent);
+  }
+
+  .header h1 {
+    font-size: 1.6em;
+    font-weight: 700;
+    background: linear-gradient(135deg, #d48a4a, #f0c27f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1px;
+  }
+
+  .header .subtitle {
+    font-size: 0.85em;
+    color: #7a6a5b;
+    margin-top: 8px;
+    font-weight: 300;
+  }
+
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 16px 20px 8px;
+    font-size: 0.75em;
+    color: #7a6a5b;
+    flex-wrap: wrap;
+  }
+
+  .legend span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .legend .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+  }
+
+  .node {
+    margin: 6px 0;
+    position: relative;
+  }
+
+  .node-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    user-select: none;
+  }
+
+  .node-header:hover {
+    background: rgba(212, 138, 74, 0.06);
+  }
+
+  .node-toggle {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    margin-top: 2px;
+    transition: all 0.2s ease;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+  }
+
+  .node-text {
+    flex: 1;
+    line-height: 1.6;
+    font-size: 0.9em;
+  }
+
+  .node-children {
+    margin-left: 26px;
+    border-left: 1px solid rgba(212, 138, 74, 0.12);
+    padding-left: 10px;
+    overflow: hidden;
+    transition: max-height 0.35s ease, opacity 0.25s ease;
+  }
+
+  .node-children.collapsed {
+    max-height: 0 !important;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .level-0 > .node-header {
+    background: linear-gradient(135deg, rgba(212, 138, 74, 0.15), rgba(240, 194, 127, 0.08));
+    border: 1px solid rgba(212, 138, 74, 0.25);
+    border-radius: 10px;
+    margin-bottom: 4px;
+  }
+
+  .level-0 > .node-header .node-text {
+    font-weight: 700;
+    font-size: 1.05em;
+    color: #f0c27f;
+  }
+
+  .level-0 > .node-header .node-toggle {
+    background: rgba(212, 138, 74, 0.25);
+    color: #f0c27f;
+  }
+
+  .level-1 > .node-header .node-text {
+    font-weight: 500;
+    color: #d4b896;
+  }
+
+  .level-1 > .node-header .node-toggle {
+    background: rgba(212, 138, 74, 0.12);
+    color: #c49a6c;
+  }
+
+  .level-2 > .node-header .node-text {
+    color: #b09a80;
+    font-weight: 400;
+  }
+
+  .level-2 > .node-header .node-toggle {
+    background: rgba(212, 138, 74, 0.08);
+    color: #a08a6a;
+  }
+
+  .level-3 > .node-header .node-text {
+    color: #8a7a68;
+    font-weight: 300;
+    font-size: 0.85em;
+  }
+
+  .level-3 > .node-header .node-toggle {
+    background: rgba(212, 138, 74, 0.05);
+    color: #7a6a58;
+  }
+
+  .leaf > .node-header .node-toggle {
+    background: none;
+    color: #5a4a38;
+    font-size: 6px;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 4px;
+    font-size: 0.72em;
+    font-weight: 500;
+    margin-left: 6px;
+    vertical-align: middle;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .tag-def { background: rgba(168, 130, 255, 0.15); color: #b89aff; }
+  .tag-exam { background: rgba(255, 170, 100, 0.15); color: #ffaa64; }
+  .tag-adv { background: rgba(100, 220, 150, 0.15); color: #64dc96; }
+  .tag-disadv { background: rgba(255, 120, 120, 0.15); color: #ff8a8a; }
+  .tag-tip { background: rgba(255, 220, 100, 0.15); color: #ffd64a; }
+  .tag-quote { background: rgba(140, 180, 255, 0.15); color: #8cb4ff; }
+
+  .controls {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px 0 4px;
+  }
+
+  .ctrl-btn {
+    padding: 6px 16px;
+    border: 1px solid rgba(212, 138, 74, 0.2);
+    background: rgba(212, 138, 74, 0.06);
+    color: #c49a6c;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.78em;
+    font-family: 'Noto Sans SC', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .ctrl-btn:hover {
+    background: rgba(212, 138, 74, 0.14);
+    border-color: rgba(212, 138, 74, 0.35);
+  }
+
+  strong { color: #d4b896; font-weight: 500; }
+  em { font-style: normal; color: #f0c27f; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Lecture 2b: Requirements Elicitation</h1>
+  <div class="subtitle">CITS4401 Software Requirements & Design -- 思维导图</div>
+</div>
+
+<div class="legend">
+  <span><span class="dot" style="background:#b89aff"></span>定义</span>
+  <span><span class="dot" style="background:#ffaa64"></span>考试重点</span>
+  <span><span class="dot" style="background:#64dc96"></span>优势</span>
+  <span><span class="dot" style="background:#ff8a8a"></span>劣势/风险</span>
+  <span><span class="dot" style="background:#ffd64a"></span>建议</span>
+  <span><span class="dot" style="background:#8cb4ff"></span>引言</span>
+</div>
+
+<div class="controls">
+  <button class="ctrl-btn" onclick="toggleAll(true)">全部展开</button>
+  <button class="ctrl-btn" onclick="toggleAll(false)">全部折叠</button>
+  <button class="ctrl-btn" onclick="toggleAll(false); expandLevel(0); expandLevel(1);">展开两级</button>
+</div>
+
+<div class="container" id="tree"></div>
+
+<script>
+const data = {
+  text: "Requirements Elicitation 需求获取",
+  children: [
+    {
+      text: "定位：需求工程四大活动中的第一步",
+      children: [
+        { text: "获取 (Elicitation) ← <em>本讲焦点</em>" },
+        { text: "分析 (Analysis)" },
+        { text: "规格说明 (Specification)" },
+        { text: "验证 (Validation)" },
+      ]
+    },
+    {
+      text: "一、需求 vs 规格说明 <span class='tag tag-quote'>引言</span>",
+      children: [
+        { text: "W. Royce (IEEE Software, 2005) 的观点：", children: [
+          { text: "\"Requirements\" 可能是行业中被滥用最多的词" },
+          { text: "\"Required\" 意味着不可谈判，但实际中需求不断被修改和协商" },
+          { text: "建议用 \"Specification\" 替代——规格说明是可变的，代表当前理解状态" },
+        ]},
+        { text: "核心启示：不要把需求当成铁板钉钉，要看作不断演化的理解过程 <span class='tag tag-tip'>建议</span>" },
+      ]
+    },
+    {
+      text: "二、什么是需求获取？",
+      children: [
+        { text: "<strong>正式定义</strong>：利益相关者（客户/买家/用户/监管者等）发现、揭示、表达并理解其需求的过程 <span class='tag tag-def'>定义</span>", children: [
+          { text: "四个关键动词：discover（发现隐藏需求）→ reveal（暴露出来）→ articulate（清楚表达）→ understand（达成共同理解）" },
+        ]},
+        { text: "别名：需求捕获 (capture)、需求发现 (discovery)、需求采集 (acquisition)、需求收集 (gathering)" },
+        { text: "<strong>沟通 (Communication)</strong>", children: [
+          { text: "获取从根本上是一种<em>人的活动 (human activity)</em>，不是技术活动" },
+          { text: "核心原则：各利益相关者之间的<em>有效沟通 (effective communication)</em>" },
+          { text: "需求专家 = 用户领域与技术领域之间的<em>中介/翻译官</em>" },
+        ]},
+        { text: "<strong>项目范围 (Project Scope)</strong>", children: [
+          { text: "描述要构建的软件及其目的" },
+          { text: "对交付物进行优先级排序 (Prioritizing)，最重要的需求优先" },
+          { text: "范围同时涉及 <em>what</em>（产出什么）和 <em>how</em>（时间与资源）" },
+        ]},
+        { text: "<strong>软件范围 (Software Scope)</strong> [Pressman 24.3]", children: [
+          { text: "上下文 (Context)：软件如何嵌入更大的系统/产品/业务环境，以及由此产生的约束" },
+          { text: "描述 (Description)：软件本身的功能描述" },
+          { text: "优先级 (Prioritizing)：不同需求的轻重缓急排序" },
+        ]},
+      ]
+    },
+    {
+      text: "三、需求获取的挑战",
+      children: [
+        { text: "<strong>表达问题 (Articulation Problems)</strong>：人们不知道自己不知道什么，所以无法告知 <span class='tag tag-exam'>考试重点</span>" },
+        { text: "<strong>沟通障碍 (Communication Barriers)</strong>：不同领域使用不同\"语言\"" },
+        { text: "<strong>知识和认知局限 (Knowledge & Cognitive Limitations)</strong>：管理复杂性的能力有限" },
+        { text: "<strong>人类行为问题 (Human Behaviour Issues)</strong>：利益相关者之间需求冲突" },
+        { text: "<strong>技术问题 (Technical Issues)</strong>：变更管理困难 + 过度僵化遵循方法论" },
+      ]
+    },
+    {
+      text: "四、需求来源（6大来源） <span class='tag tag-exam'>考试重点</span>",
+      children: [
+        { text: "<strong>1. 目标 (Goals)</strong>", children: [
+          { text: "又称 business concern 或 critical success factor" },
+          { text: "为软件提供动机，但通常表述模糊" },
+          { text: "需评估目标的价值（优先级）和成本" },
+          { text: "<strong>可行性研究 (Feasibility Study)</strong>：低成本的目标评估方式" },
+        ]},
+        { text: "<strong>2. 领域知识 (Domain Knowledge)</strong>", children: [
+          { text: "行业特定概念 (industry-specific concepts)" },
+          { text: "业务流程 (Business processes)" },
+          { text: "法规和合规要求 (Regulatory & compliance requirements)" },
+        ]},
+        { text: "<strong>3. 利益相关者 (Stakeholders)</strong>", children: [
+          { text: "过度强调一组利益相关者而牺牲其他 → 软件不满意" },
+          { text: "需识别、代表和管理多种\"观点 (viewpoints)\"" },
+          { text: "需求协商 (Requirements negotiation) → 后续课程讨论" },
+        ]},
+        { text: "<strong>4. 业务规则 (Business Rules)</strong>", children: [
+          { text: "定义或约束业务结构/行为的声明" },
+          { text: "例：\"有未缴学费的学生不能注册下学期课程\"" },
+          { text: "通常不可协商的硬性约束" },
+        ]},
+        { text: "<strong>5. 运营环境 (Operational Environment)</strong>", children: [
+          { text: "从软件执行环境派生的需求（如实时系统的时间约束）" },
+          { text: "必须主动寻找——极大影响可行性、成本和设计选择" },
+        ]},
+        { text: "<strong>6. 组织环境 (Organisational Environment)</strong>", children: [
+          { text: "受组织结构、文化和内部政治影响" },
+          { text: "原则：新软件不应强制对业务流程做计划外的改变" },
+        ]},
+      ]
+    },
+    {
+      text: "五、获取方法与技术",
+      children: [
+        { text: "方法论思路（左列）：提问 / 观察推断 / 讨论制定 / 基于标准谈判 / 研究问题 / 创造性发现 / 假设" },
+        { text: "具体技术（右列）：访谈 / 场景 / 原型 / 引导式会议 / 观察 / 用户故事（列表非穷举）" },
+      ]
+    },
+    {
+      text: "六、四种核心获取方法详解",
+      children: [
+        { text: "<strong>方法1：访谈 (Interviews)</strong>", children: [
+          { text: "定义：系统性地从某人那里收集信息的尝试 <span class='tag tag-def'>定义</span>" },
+          { text: "成功关键：识别工作流程、影响因素、系统组成元素（文档/流程/政策）" },
+          { text: "五步流程 <span class='tag tag-exam'>考试重点</span>", children: [
+            { text: "1. 准备访谈（研究被访者背景）" },
+            { text: "2. 计划和安排（准备问题清单、控制时间）" },
+            { text: "3. 开始和结束（建立信任、说明目的）" },
+            { text: "4. 进行访谈（倾听为主）" },
+            { text: "5. 后续跟进澄清" },
+          ]},
+          { text: "挑战：利益相关者可能抵制参与需求定义（Dilbert漫画：\"那是疯话\"）" },
+          { text: "挑战：不同用户建议可能互相矛盾（Dilbert漫画：\"我们应该跟楼外的人聊聊\"）" },
+        ]},
+        { text: "<strong>方法2：引导式会议 (Facilitated Meetings)</strong>", children: [
+          { text: "目的：追求聚合效应 (summative effect)——群体 > 个体之和" },
+          { text: "头脑风暴与完善在访谈中难以浮现的想法 <span class='tag tag-adv'>优势</span>" },
+          { text: "冲突需求在早期暴露，让利益相关者及时识别 <span class='tag tag-adv'>优势</span>" },
+          { text: "可能产出更丰富、更一致的需求集合 <span class='tag tag-adv'>优势</span>" },
+          { text: "需要引导者 (Facilitator) 避免不良群体动力学 <span class='tag tag-disadv'>劣势</span>" },
+          { text: "耗时 <span class='tag tag-disadv'>劣势</span>" },
+          { text: "<strong>头脑风暴 (Brainstorming)</strong>", children: [
+            { text: "简单的团体创意生成技术" },
+            { text: "核心原则：无批评、无评判的氛围" },
+            { text: "最佳规模：4-10人，1人启动但不限制方向" },
+          ]},
+        ]},
+        { text: "<strong>方法3：原型 (Prototypes)</strong> <span class='tag tag-exam'>考试重点</span>", children: [
+          { text: "澄清模糊需求的有价值工具" },
+          { text: "为用户提供上下文，帮助理解和表达需求" },
+          { text: "范围广泛：纸质草图 → Beta测试版" },
+          { text: "可用于需求验证 (validation)" },
+          { text: "<strong>低保真原型 (Low fidelity)</strong> 通常更好——避免\"锚定效应 (anchoring)\" <span class='tag tag-tip'>建议</span>" },
+          { text: "风险：过早选择实现方式 (Choose implementation too early) <span class='tag tag-disadv'>风险</span>" },
+          { text: "风险：粗糙原型变成最终产品 <span class='tag tag-disadv'>风险</span>" },
+        ]},
+        { text: "<strong>方法4：观察/民族志 (Observation / Ethnography)</strong>", children: [
+          { text: "分析师沉浸在实际工作环境中，观察日常任务" },
+          { text: "发现<em>实际过程 (actual)</em> 而非<em>正式过程 (formal)</em>——关键区分 <span class='tag tag-exam'>考试重点</span>" },
+          { text: "能发现太微妙/复杂而难以用语言描述的隐含需求 <span class='tag tag-adv'>优势</span>" },
+          { text: "昂贵（分析师需在客户环境长期驻扎） <span class='tag tag-disadv'>劣势</span>" },
+          { text: "不适合发现组织层面或领域层面的需求 <span class='tag tag-disadv'>劣势</span>" },
+        ]},
+      ]
+    },
+    {
+      text: "七、场景、用例与用户故事（补充方法）",
+      children: [
+        { text: "<strong>场景和用例 (Scenarios & Use Cases)</strong>", children: [
+          { text: "常用于计划型方法论 (planned methodologies)，特别是 UML 环境" },
+          { text: "为需求获取提供上下文，支持 \"what if\" 和 \"how is this done\" 类问题" },
+          { text: "最常见类型：用例描述 (use case description)" },
+        ]},
+        { text: "<strong>用户故事 (User Stories)</strong> <span class='tag tag-exam'>考试重点</span>", children: [
+          { text: "常用于敏捷方法论 (agile methodologies)" },
+          { text: "格式：\"As a &lt;角色&gt;, I want &lt;目标&gt; so that &lt;好处&gt;\"" },
+          { text: "只包含刚好足够的信息用于工作量估算" },
+          { text: "目的：避免早期过度细化需求导致的浪费" },
+        ]},
+        { text: "场景/用例 vs 用户故事：前者适合计划驱动开发，后者适合敏捷开发" },
+      ]
+    },
+    {
+      text: "八、综合指导",
+      children: [
+        { text: "<strong>通用需求过程（5步行动链）</strong> <span class='tag tag-exam'>考试重点</span>", children: [
+          { text: "Identify（识别）→ Ask（提问）→ Analyse（分析）→ Confirm（确认/验证）→ Synthesize（综合/规格说明）" },
+        ]},
+        { text: "<strong>系统思维框架（5个引导问题）</strong>", children: [
+          { text: "1. 我们试图达到什么目标？" },
+          { text: "2. 我们控制哪些影响目标的决策？" },
+          { text: "3. 什么约束了我们的选择范围？" },
+          { text: "4. 用什么标准评估候选方案？" },
+          { text: "5. 什么决策带来最满意的结果？" },
+        ]},
+        { text: "<strong>Sommerville & Sawyer 13条获取指导方针</strong> <span class='tag tag-exam'>考试重点</span>", children: [
+          { text: "1. 评估系统<em>可行性</em>" },
+          { text: "2. 对<em>组织和政治</em>因素保持敏感" },
+          { text: "3. 识别和咨询<em>利益相关者</em>" },
+          { text: "4. <em>记录</em>需求来源" },
+          { text: "5. <em>定义</em>运营环境" },
+          { text: "6. 用<em>业务关注点</em>驱动获取" },
+          { text: "7. 寻找<em>领域约束</em>" },
+          { text: "8. 记录需求<em>理由 (rationale)</em>" },
+          { text: "9. 从<em>多个视角</em>收集需求" },
+          { text: "10. 对理解不清的需求做<em>原型</em>" },
+          { text: "11. 用<em>场景</em>获取需求" },
+          { text: "12. 定义<em>运营流程</em>" },
+          { text: "13. <em>复用</em>需求" },
+        ]},
+      ]
+    },
+    {
+      text: "九、核心忠告与总结",
+      children: [
+        { text: "获取需求时确保<strong>正确的人在场</strong>——否则得到的就是糟糕/无效的需求 <span class='tag tag-tip'>建议</span>" },
+        { text: "获取的本质是以沟通为核心的人类活动，不是技术活动" },
+        { text: "六大来源缺一不可，遗漏任何来源都可能导致关键需求缺失" },
+        { text: "四种方法各有所长，实际中需组合使用" },
+        { text: "最大挑战是人的因素而非技术因素" },
+      ]
+    },
+    {
+      text: "十、推荐阅读",
+      children: [
+        { text: "SWEBOK 3.0 Chapter 1 Section 3" },
+        { text: "Pressman 第9版 Chapter 5 Understanding Requirements" },
+        { text: "Bruegge & Dutoit 第3版 Section 4.3.1 + Section 7.2" },
+      ]
+    },
+  ]
+};
+
+let allNodes = [];
+
+function renderTree(node, level, parentEl) {
+  const div = document.createElement('div');
+  div.className = `node level-${level}` + (node.children ? '' : ' leaf');
+
+  const header = document.createElement('div');
+  header.className = 'node-header';
+
+  const toggle = document.createElement('span');
+  toggle.className = 'node-toggle';
+  toggle.textContent = node.children ? '−' : '•';
+
+  const text = document.createElement('span');
+  text.className = 'node-text';
+  text.innerHTML = node.text;
+
+  header.appendChild(toggle);
+  header.appendChild(text);
+  div.appendChild(header);
+
+  let childContainer = null;
+  if (node.children) {
+    childContainer = document.createElement('div');
+    childContainer.className = 'node-children';
+    node.children.forEach(c => renderTree(c, level + 1, childContainer));
+    div.appendChild(childContainer);
+
+    header.addEventListener('click', () => {
+      const collapsed = childContainer.classList.toggle('collapsed');
+      toggle.textContent = collapsed ? '+' : '−';
+    });
+  }
+
+  allNodes.push({ div, childContainer, toggle, level });
+  parentEl.appendChild(div);
+}
+
+function toggleAll(expand) {
+  allNodes.forEach(n => {
+    if (n.childContainer) {
+      if (expand) {
+        n.childContainer.classList.remove('collapsed');
+        n.toggle.textContent = '−';
+      } else {
+        n.childContainer.classList.add('collapsed');
+        n.toggle.textContent = '+';
+      }
+    }
+  });
+}
+
+function expandLevel(targetLevel) {
+  allNodes.forEach(n => {
+    if (n.childContainer && n.level <= targetLevel) {
+      n.childContainer.classList.remove('collapsed');
+      n.toggle.textContent = '−';
+    }
+  });
+}
+
+const tree = document.getElementById('tree');
+data.children.forEach(c => renderTree(c, 0, tree));
+</script>
+
+</body>
+</html>

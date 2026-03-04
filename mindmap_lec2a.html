@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 2a - Requirements Engineering 思维导图</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: #0a0e1a;
+    color: #e0e4ef;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .header {
+    text-align: center;
+    padding: 40px 20px 20px;
+    position: relative;
+  }
+
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #4a90d9, transparent);
+  }
+
+  .header h1 {
+    font-size: 1.6em;
+    font-weight: 700;
+    background: linear-gradient(135deg, #4a90d9, #7ec8e3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1px;
+  }
+
+  .header .subtitle {
+    font-size: 0.85em;
+    color: #6a7a9b;
+    margin-top: 8px;
+    font-weight: 300;
+  }
+
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 16px 20px 8px;
+    font-size: 0.75em;
+    color: #6a7a9b;
+    flex-wrap: wrap;
+  }
+
+  .legend span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .legend .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+  }
+
+  /* Tree nodes */
+  .node {
+    margin: 6px 0;
+    position: relative;
+  }
+
+  .node-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    user-select: none;
+  }
+
+  .node-header:hover {
+    background: rgba(74, 144, 217, 0.06);
+  }
+
+  .node-toggle {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    margin-top: 2px;
+    transition: all 0.2s ease;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+  }
+
+  .node-text {
+    flex: 1;
+    line-height: 1.6;
+    font-size: 0.9em;
+  }
+
+  .node-children {
+    margin-left: 26px;
+    border-left: 1px solid rgba(74, 144, 217, 0.12);
+    padding-left: 10px;
+    overflow: hidden;
+    transition: max-height 0.35s ease, opacity 0.25s ease;
+  }
+
+  .node-children.collapsed {
+    max-height: 0 !important;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Level styles */
+  .level-0 > .node-header {
+    background: linear-gradient(135deg, rgba(74, 144, 217, 0.15), rgba(126, 200, 227, 0.08));
+    border: 1px solid rgba(74, 144, 217, 0.25);
+    border-radius: 10px;
+    margin-bottom: 4px;
+  }
+
+  .level-0 > .node-header .node-text {
+    font-weight: 700;
+    font-size: 1.05em;
+    color: #7ec8e3;
+  }
+
+  .level-0 > .node-header .node-toggle {
+    background: rgba(74, 144, 217, 0.25);
+    color: #7ec8e3;
+  }
+
+  .level-1 > .node-header .node-text {
+    font-weight: 500;
+    color: #b8ccec;
+  }
+
+  .level-1 > .node-header .node-toggle {
+    background: rgba(74, 144, 217, 0.12);
+    color: #6a9fd8;
+  }
+
+  .level-2 > .node-header .node-text {
+    color: #9ab0cc;
+    font-weight: 400;
+  }
+
+  .level-2 > .node-header .node-toggle {
+    background: rgba(74, 144, 217, 0.08);
+    color: #5a8ab8;
+  }
+
+  .level-3 > .node-header .node-text {
+    color: #7a95b5;
+    font-weight: 300;
+    font-size: 0.85em;
+  }
+
+  .level-3 > .node-header .node-toggle {
+    background: rgba(74, 144, 217, 0.05);
+    color: #4a7a9b;
+  }
+
+  .leaf > .node-header .node-toggle {
+    background: none;
+    color: #3a5a7a;
+    font-size: 6px;
+  }
+
+  /* Tag styles */
+  .tag {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 4px;
+    font-size: 0.72em;
+    font-weight: 500;
+    margin-left: 6px;
+    vertical-align: middle;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .tag-def { background: rgba(168, 130, 255, 0.15); color: #b89aff; }
+  .tag-exam { background: rgba(255, 170, 100, 0.15); color: #ffaa64; }
+  .tag-data { background: rgba(100, 220, 180, 0.15); color: #64dcb4; }
+  .tag-tip { background: rgba(255, 220, 100, 0.15); color: #ffd64a; }
+  .tag-case { background: rgba(255, 120, 120, 0.15); color: #ff8a8a; }
+
+  /* Expand/Collapse all */
+  .controls {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px 0 4px;
+  }
+
+  .ctrl-btn {
+    padding: 6px 16px;
+    border: 1px solid rgba(74, 144, 217, 0.2);
+    background: rgba(74, 144, 217, 0.06);
+    color: #7aabda;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.78em;
+    font-family: 'Noto Sans SC', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .ctrl-btn:hover {
+    background: rgba(74, 144, 217, 0.14);
+    border-color: rgba(74, 144, 217, 0.35);
+  }
+
+  strong { color: #a8c4e6; font-weight: 500; }
+  em { font-style: normal; color: #7ec8e3; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Lecture 2a: Requirements Engineering</h1>
+  <div class="subtitle">CITS4401 Software Requirements & Design -- 思维导图</div>
+</div>
+
+<div class="legend">
+  <span><span class="dot" style="background:#b89aff"></span>定义</span>
+  <span><span class="dot" style="background:#ffaa64"></span>考试重点</span>
+  <span><span class="dot" style="background:#64dcb4"></span>数据</span>
+  <span><span class="dot" style="background:#ffd64a"></span>实用建议</span>
+  <span><span class="dot" style="background:#ff8a8a"></span>案例</span>
+</div>
+
+<div class="controls">
+  <button class="ctrl-btn" onclick="toggleAll(true)">全部展开</button>
+  <button class="ctrl-btn" onclick="toggleAll(false)">全部折叠</button>
+  <button class="ctrl-btn" onclick="toggleAll(false); expandLevel(0); expandLevel(1);">展开两级</button>
+</div>
+
+<div class="container" id="tree"></div>
+
+<script>
+const data = {
+  text: "Requirements Engineering 需求工程",
+  children: [
+    {
+      text: "上周回顾：核心前置概念",
+      children: [
+        { text: "<strong>利益相关者 (Stakeholders)</strong>：所有对软件项目有利益关系的人和系统 <span class='tag tag-def'>定义</span>", children: [
+          { text: "用户 (Users)：直接与系统交互的利益相关者" },
+          { text: "其他：施加需求或约束的利益相关者（如监管机构 regulatory authorities）" },
+        ]},
+        { text: "<strong>用户故事 (User Story)</strong>：捕捉用户某个具体业务需求的简短描述 <span class='tag tag-def'>定义</span>" },
+      ]
+    },
+    {
+      text: "一、什么是需求工程 (Requirements Engineering)",
+      children: [
+        { text: "<strong>需求工程 (RE)</strong>：包含需求获取与需求分析的活动 <span class='tag tag-def'>定义</span>", children: [
+          { text: "<strong>需求获取 (Requirements Elicitation)</strong>：项目参与者定义系统目的的活动——\"把需求挖出来\"" },
+          { text: "<strong>需求分析 (Requirements Analysis)</strong>：确保需求满足四大质量标准 <span class='tag tag-exam'>考试重点</span>", children: [
+            { text: "正确 (Correct)：准确反映客户意图" },
+            { text: "完整 (Complete)：没有遗漏" },
+            { text: "一致 (Consistent)：需求之间无矛盾" },
+            { text: "无歧义 (Unambiguous)：每条需求只有一种理解方式" },
+          ]},
+        ]},
+        { text: "参考来源：Bruegge and Dutoit Glossary" },
+      ]
+    },
+    {
+      text: "二、需求示例对比（从具体到模糊的四级递进）",
+      children: [
+        { text: "<strong>示例1</strong>：排序100个正整数并求平均值 → <em>极其具体</em>，输入/输出/逻辑全部明确 <span class='tag tag-case'>案例</span>" },
+        { text: "<strong>示例2</strong>：自动化订单系统，缩短处理24h、发货提前3天 → <em>有量化指标但缺实现细节</em> <span class='tag tag-case'>案例</span>" },
+        { text: "<strong>示例3</strong>：飞机自动着陆软件，无需飞行员干预 → <em>安全关键系统，一句话需求巨大复杂度</em> <span class='tag tag-case'>案例</span>" },
+        { text: "<strong>示例4</strong>：个人生产力产品，售价$200，销量100万 → <em>纯商业目标，完全没有功能描述</em> <span class='tag tag-case'>案例</span>" },
+        { text: "教学启示：现实中的需求更接近示例2-4，而非示例1 <span class='tag tag-exam'>考试重点</span>" },
+      ]
+    },
+    {
+      text: "三、为什么需求工程很难？",
+      children: [
+        { text: "软件工程是创造性的问题解决活动，不能照图施工" },
+        { text: "客户不确定自己想要什么——看到实物前难以描述" },
+        { text: "大型系统有众多利益相关者，需求和优先级各不相同甚至冲突" },
+        { text: "开发者也不确定如何构建——技术端同样有不确定性" },
+        { text: "<strong>需求蔓延 (Requirements Creep)</strong>：需求在项目中不断增加/变化，是延期和超预算的主因 <span class='tag tag-exam'>考试重点</span>" },
+        { text: "Dilbert漫画讽刺：400个功能+\"易于使用\"→ 堆砌功能的荒谬思维" },
+      ]
+    },
+    {
+      text: "四、为什么需求工程重要？（经济视角）",
+      children: [
+        { text: "糟糕的需求 → 解决错误的问题 / 尝试不可行的问题 = 巨额损失" },
+        { text: "误解需求 → 混乱的开发过程 = 反复返工" },
+        { text: "<strong>75%</strong> 的商业/IT高管预期软件项目会失败 <span class='tag tag-data'>数据</span>" },
+        { text: "美国政府2017年因失败IT项目损失 <strong>$320亿</strong> <span class='tag tag-data'>数据</span>" },
+        { text: "经验法则：需求阶段修复成本1x → 设计5-10x → 编码50-100x → 交付后数百倍" },
+        { text: "真实失败案例 <span class='tag tag-case'>案例</span>", children: [
+          { text: "昆士兰健康薪资系统：预算$600万 → 实际花费$12亿澳元（200倍超支）" },
+          { text: "英国e-Borders系统：£4.12亿，最终被取消" },
+          { text: "瑞典 Pust Siebel 警方系统：SEK 3亿，因功能差被废弃" },
+        ]},
+      ]
+    },
+    {
+      text: "五、需求工程的4个主要活动 <span class='tag tag-exam'>考试重点</span>",
+      children: [
+        { text: "<strong>1. 获取 (Elicitation)</strong>：发掘需求——把隐藏在客户脑海中的需求挖出来 <span class='tag tag-def'>定义</span>" },
+        { text: "<strong>2. 分析 (Analysis)</strong>：确保需求正确、完整、一致、无歧义——质量把关 <span class='tag tag-def'>定义</span>" },
+        { text: "<strong>3. 规格说明 (Specification)</strong>：将需求文档化——形成正式的需求规格说明书 (SRS) <span class='tag tag-def'>定义</span>" },
+        { text: "<strong>4. 验证 (Validation)</strong>：确保系统满足客户需要——与客户确认 <span class='tag tag-def'>定义</span>" },
+        { text: "比喻：获取=采矿，分析=选矿，规格说明=铸造，验证=质检" },
+        { text: "分析 vs 验证的区别：分析检查文档本身质量；验证检查文档是否反映客户真实需要" },
+      ]
+    },
+    {
+      text: "六、软件需求的定义与分类",
+      children: [
+        { text: "<strong>软件需求 (Software Requirement)</strong>：用户为解决问题/达成目标/满足约束所需的条件或能力 <span class='tag tag-def'>定义</span>" },
+        { text: "<strong>功能需求 (Functional Requirement)</strong> <span class='tag tag-exam'>考试重点</span>", children: [
+          { text: "定义：系统必须支持的功能领域——描述系统\"做什么\" (What)" },
+          { text: "描述参与者与系统的交互，<em>独立于系统实现方式</em>" },
+          { text: "例：\"系统将显示用户当前的银行账户余额\"" },
+        ]},
+        { text: "<strong>非功能需求 (Non-functional Requirement)</strong> <span class='tag tag-exam'>考试重点</span>", children: [
+          { text: "定义：系统上用户可见的约束（限制或局限）——描述系统\"做得怎么样\"" },
+          { text: "例：\"系统将在5秒内显示用户银行账户详情\"" },
+          { text: "比喻：功能需求=菜单上的菜品，非功能需求=上菜速度和环境" },
+        ]},
+        { text: "<strong>质量属性 (Quality Attributes)</strong>：非功能需求的一个子类", children: [
+          { text: "可用性 (Usability)：是否易学易用" },
+          { text: "可靠性 (Reliability)：是否持续正确运行" },
+          { text: "安全性 (Security)：信息安全，防恶意攻击" },
+          { text: "安全 (Safety)：人身安全，防事故 —— 注意与 Security 的区分" },
+        ]},
+      ]
+    },
+    {
+      text: "七、项目需求的三个层次",
+      children: [
+        { text: "<strong>业务需求 (Business Requirements)</strong>：用商业术语描述需交付什么以提供价值——\"为什么做\" <span class='tag tag-def'>定义</span>" },
+        { text: "<strong>产品需求 (Product Requirements)</strong>：描述系统/产品，是实现业务需求的方式之一——\"做什么\" <span class='tag tag-def'>定义</span>" },
+        { text: "<strong>过程需求 (Process Requirements)</strong>：开发组织必须遵循的流程和约束——\"怎么做\" <span class='tag tag-def'>定义</span>" },
+        { text: "三者关系：业务需求=目标，产品需求=方案，过程需求=规则" },
+      ]
+    },
+    {
+      text: "八、需求为什么总在变化？（复习问答）",
+      children: [
+        { text: "人们并不一定知道自己想要什么" },
+        { text: "交付部分软件可能催生新需求" },
+        { text: "软件复杂，利益相关者多且需求多" },
+        { text: "难以预测哪些需求会持续、哪些会变化" },
+        { text: "客户优先级随项目进展而变化" },
+        { text: "人们难以用语言表达需求，直到看到可工作的原型 [Pressman 3.5]" },
+      ]
+    },
+    {
+      text: "九、实用建议与文档结构",
+      children: [
+        { text: "仅用文字难以捕捉意图 → 使用图表/图片辅助 <span class='tag tag-tip'>建议</span>" },
+        { text: "PowerPoint 做界面原型 (mock-up)，速度是代码原型的 1/10 <span class='tag tag-tip'>建议</span>" },
+        { text: "需求文档 (SRS) 标准结构 <span class='tag tag-tip'>建议</span>", children: [
+          { text: "1. Introduction：目的、范围、目标、术语、参考" },
+          { text: "2. Current System：现有系统描述" },
+          { text: "3. Proposed System：概述 + 功能需求 + 非功能需求（8个子类）+ 系统模型" },
+          { text: "4. Glossary：术语表" },
+        ]},
+      ]
+    },
+    {
+      text: "十、推荐阅读",
+      children: [
+        { text: "Pressman《Software Engineering》10th ed. Chapter 1" },
+        { text: "Bruegge & Dutoit《OO Software Engineering》Section 1.1" },
+        { text: "Cockburn《Agile Software Development》" },
+      ]
+    },
+  ]
+};
+
+let allNodes = [];
+
+function renderTree(node, level, parentEl) {
+  const div = document.createElement('div');
+  div.className = `node level-${level}` + (node.children ? '' : ' leaf');
+
+  const header = document.createElement('div');
+  header.className = 'node-header';
+
+  const toggle = document.createElement('span');
+  toggle.className = 'node-toggle';
+  toggle.textContent = node.children ? '−' : '•';
+
+  const text = document.createElement('span');
+  text.className = 'node-text';
+  text.innerHTML = node.text;
+
+  header.appendChild(toggle);
+  header.appendChild(text);
+  div.appendChild(header);
+
+  let childContainer = null;
+  if (node.children) {
+    childContainer = document.createElement('div');
+    childContainer.className = 'node-children';
+    node.children.forEach(c => renderTree(c, level + 1, childContainer));
+    div.appendChild(childContainer);
+
+    header.addEventListener('click', () => {
+      const collapsed = childContainer.classList.toggle('collapsed');
+      toggle.textContent = collapsed ? '+' : '−';
+    });
+  }
+
+  allNodes.push({ div, childContainer, toggle, level });
+  parentEl.appendChild(div);
+}
+
+function toggleAll(expand) {
+  allNodes.forEach(n => {
+    if (n.childContainer) {
+      if (expand) {
+        n.childContainer.classList.remove('collapsed');
+        n.toggle.textContent = '−';
+      } else {
+        n.childContainer.classList.add('collapsed');
+        n.toggle.textContent = '+';
+      }
+    }
+  });
+}
+
+function expandLevel(targetLevel) {
+  allNodes.forEach(n => {
+    if (n.childContainer && n.level <= targetLevel) {
+      n.childContainer.classList.remove('collapsed');
+      n.toggle.textContent = '−';
+    }
+  });
+}
+
+const tree = document.getElementById('tree');
+data.children.forEach(c => renderTree(c, 0, tree));
+</script>
+
+</body>
+</html>
