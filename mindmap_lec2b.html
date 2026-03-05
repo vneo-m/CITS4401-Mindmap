@@ -11,8 +11,8 @@
 
   body {
     font-family: 'Noto Sans SC', sans-serif;
-    background: #0d0f18;
-    color: #e0e4ef;
+    background: #fdf8f3;
+    color: #2a1e10;
     min-height: 100vh;
     overflow-x: hidden;
   }
@@ -37,7 +37,7 @@
   .header h1 {
     font-size: 1.6em;
     font-weight: 700;
-    background: linear-gradient(135deg, #d48a4a, #f0c27f);
+    background: linear-gradient(135deg, #b86020, #d4893a);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     letter-spacing: 1px;
@@ -45,7 +45,7 @@
 
   .header .subtitle {
     font-size: 0.85em;
-    color: #7a6a5b;
+    color: #6a5a48;
     margin-top: 8px;
     font-weight: 300;
   }
@@ -56,7 +56,7 @@
     gap: 20px;
     padding: 16px 20px 8px;
     font-size: 0.75em;
-    color: #7a6a5b;
+    color: #6a5a48;
     flex-wrap: wrap;
   }
 
@@ -97,7 +97,7 @@
   }
 
   .node-header:hover {
-    background: rgba(212, 138, 74, 0.06);
+    background: rgba(212, 138, 74, 0.09);
   }
 
   .node-toggle {
@@ -123,7 +123,7 @@
 
   .node-children {
     margin-left: 26px;
-    border-left: 1px solid rgba(212, 138, 74, 0.12);
+    border-left: 1px solid rgba(212, 138, 74, 0.22);
     padding-left: 10px;
     overflow: hidden;
     transition: max-height 0.35s ease, opacity 0.25s ease;
@@ -136,8 +136,8 @@
   }
 
   .level-0 > .node-header {
-    background: linear-gradient(135deg, rgba(212, 138, 74, 0.15), rgba(240, 194, 127, 0.08));
-    border: 1px solid rgba(212, 138, 74, 0.25);
+    background: linear-gradient(135deg, rgba(212, 138, 74, 0.12), rgba(240, 194, 127, 0.06));
+    border: 1px solid rgba(212, 138, 74, 0.28);
     border-radius: 10px;
     margin-bottom: 4px;
   }
@@ -145,36 +145,36 @@
   .level-0 > .node-header .node-text {
     font-weight: 700;
     font-size: 1.05em;
-    color: #f0c27f;
+    color: #111111;
   }
 
   .level-0 > .node-header .node-toggle {
-    background: rgba(212, 138, 74, 0.25);
-    color: #f0c27f;
+    background: rgba(212, 138, 74, 0.2);
+    color: #8a4010;
   }
 
   .level-1 > .node-header .node-text {
     font-weight: 500;
-    color: #d4b896;
+    color: #222222;
   }
 
   .level-1 > .node-header .node-toggle {
     background: rgba(212, 138, 74, 0.12);
-    color: #c49a6c;
+    color: #7a5030;
   }
 
   .level-2 > .node-header .node-text {
-    color: #b09a80;
+    color: #333333;
     font-weight: 400;
   }
 
   .level-2 > .node-header .node-toggle {
     background: rgba(212, 138, 74, 0.08);
-    color: #a08a6a;
+    color: #7a5a3a;
   }
 
   .level-3 > .node-header .node-text {
-    color: #8a7a68;
+    color: #555555;
     font-weight: 300;
     font-size: 0.85em;
   }
@@ -186,7 +186,7 @@
 
   .leaf > .node-header .node-toggle {
     background: none;
-    color: #5a4a38;
+    color: #aaaaaa;
     font-size: 6px;
   }
 
@@ -201,12 +201,12 @@
     font-family: 'JetBrains Mono', monospace;
   }
 
-  .tag-def { background: rgba(168, 130, 255, 0.15); color: #b89aff; }
-  .tag-exam { background: rgba(255, 170, 100, 0.15); color: #ffaa64; }
-  .tag-adv { background: rgba(100, 220, 150, 0.15); color: #64dc96; }
-  .tag-disadv { background: rgba(255, 120, 120, 0.15); color: #ff8a8a; }
-  .tag-tip { background: rgba(255, 220, 100, 0.15); color: #ffd64a; }
-  .tag-quote { background: rgba(140, 180, 255, 0.15); color: #8cb4ff; }
+  .tag-def { background: rgba(100, 60, 190, 0.09); color: #5030a0; }
+  .tag-exam { background: rgba(180, 90, 0, 0.09); color: #a05010; }
+  .tag-adv { background: rgba(0, 140, 70, 0.09); color: #006840; }
+  .tag-disadv { background: rgba(180, 30, 30, 0.09); color: #a02020; }
+  .tag-tip { background: rgba(160, 110, 0, 0.09); color: #806000; }
+  .tag-quote { background: rgba(40, 90, 200, 0.09); color: #2050c0; }
 
   .controls {
     display: flex;
@@ -217,9 +217,9 @@
 
   .ctrl-btn {
     padding: 6px 16px;
-    border: 1px solid rgba(212, 138, 74, 0.2);
-    background: rgba(212, 138, 74, 0.06);
-    color: #c49a6c;
+    border: 1px solid rgba(212, 138, 74, 0.3);
+    background: rgba(212, 138, 74, 0.08);
+    color: #8a5020;
     border-radius: 6px;
     cursor: pointer;
     font-size: 0.78em;
@@ -229,11 +229,11 @@
 
   .ctrl-btn:hover {
     background: rgba(212, 138, 74, 0.14);
-    border-color: rgba(212, 138, 74, 0.35);
+    border-color: rgba(212, 138, 74, 0.4);
   }
 
-  strong { color: #d4b896; font-weight: 500; }
-  em { font-style: normal; color: #f0c27f; }
+  strong { color: #111111; font-weight: 500; }
+  em { font-style: normal; color: #8a4010; }
 </style>
 </head>
 <body>

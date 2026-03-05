@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 1 - Introduction to CITS4401 思维导图</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: #f0f4f8;
+    color: #1e2a3a;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .header {
+    text-align: center;
+    padding: 40px 20px 20px;
+    position: relative;
+  }
+
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #4a90d9, transparent);
+  }
+
+  .header h1 {
+    font-size: 1.6em;
+    font-weight: 700;
+    background: linear-gradient(135deg, #2270b8, #1a96c8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1px;
+  }
+
+  .header .subtitle {
+    font-size: 0.85em;
+    color: #5a6a80;
+    margin-top: 8px;
+    font-weight: 300;
+  }
+
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 16px 20px 8px;
+    font-size: 0.75em;
+    color: #5a6a80;
+    flex-wrap: wrap;
+  }
+
+  .legend span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .legend .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+  }
+
+  .node {
+    margin: 6px 0;
+    position: relative;
+  }
+
+  .node-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    user-select: none;
+  }
+
+  .node-header:hover {
+    background: rgba(74, 144, 217, 0.09);
+  }
+
+  .node-toggle {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    margin-top: 2px;
+    transition: all 0.2s ease;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+  }
+
+  .node-text {
+    flex: 1;
+    line-height: 1.6;
+    font-size: 0.9em;
+  }
+
+  .node-children {
+    margin-left: 26px;
+    border-left: 1px solid rgba(74, 144, 217, 0.22);
+    padding-left: 10px;
+    overflow: hidden;
+    transition: max-height 0.35s ease, opacity 0.25s ease;
+  }
+
+  .node-children.collapsed {
+    max-height: 0 !important;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .level-0 > .node-header {
+    background: linear-gradient(135deg, rgba(74, 144, 217, 0.12), rgba(126, 200, 227, 0.06));
+    border: 1px solid rgba(74, 144, 217, 0.28);
+    border-radius: 10px;
+    margin-bottom: 4px;
+  }
+
+  .level-0 > .node-header .node-text {
+    font-weight: 700;
+    font-size: 1.05em;
+    color: #111111;
+  }
+
+  .level-0 > .node-header .node-toggle {
+    background: rgba(74, 144, 217, 0.2);
+    color: #1a6fa0;
+  }
+
+  .level-1 > .node-header .node-text {
+    font-weight: 500;
+    color: #222222;
+  }
+
+  .level-1 > .node-header .node-toggle {
+    background: rgba(74, 144, 217, 0.12);
+    color: #3a6aa0;
+  }
+
+  .level-2 > .node-header .node-text {
+    color: #333333;
+    font-weight: 400;
+  }
+
+  .level-2 > .node-header .node-toggle {
+    background: rgba(74, 144, 217, 0.08);
+    color: #5a8ab8;
+  }
+
+  .level-3 > .node-header .node-text {
+    color: #555555;
+    font-weight: 300;
+    font-size: 0.85em;
+  }
+
+  .level-3 > .node-header .node-toggle {
+    background: rgba(74, 144, 217, 0.05);
+    color: #4a7a9b;
+  }
+
+  .leaf > .node-header .node-toggle {
+    background: none;
+    color: #aaaaaa;
+    font-size: 6px;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 4px;
+    font-size: 0.72em;
+    font-weight: 500;
+    margin-left: 6px;
+    vertical-align: middle;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .tag-def { background: rgba(100, 60, 190, 0.09); color: #5030a0; }
+  .tag-exam { background: rgba(180, 90, 0, 0.09); color: #a05010; }
+  .tag-data { background: rgba(0, 140, 90, 0.09); color: #007850; }
+  .tag-tip { background: rgba(160, 110, 0, 0.09); color: #806000; }
+  .tag-case { background: rgba(180, 30, 30, 0.09); color: #a02020; }
+
+  .controls {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px 0 4px;
+  }
+
+  .ctrl-btn {
+    padding: 6px 16px;
+    border: 1px solid rgba(74, 144, 217, 0.3);
+    background: rgba(74, 144, 217, 0.08);
+    color: #2270b8;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.78em;
+    font-family: 'Noto Sans SC', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .ctrl-btn:hover {
+    background: rgba(74, 144, 217, 0.14);
+    border-color: rgba(74, 144, 217, 0.4);
+  }
+
+  strong { color: #111111; font-weight: 500; }
+  em { font-style: normal; color: #0a7aaa; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Lecture 1: Introduction to CITS4401</h1>
+  <div class="subtitle">CITS4401 Software Requirements & Design — 思维导图</div>
+</div>
+
+<div class="legend">
+  <span><span class="dot" style="background:#b89aff"></span>定义</span>
+  <span><span class="dot" style="background:#ffaa64"></span>考试重点</span>
+  <span><span class="dot" style="background:#64dcb4"></span>数据</span>
+  <span><span class="dot" style="background:#ffd64a"></span>实用建议</span>
+  <span><span class="dot" style="background:#ff8a8a"></span>案例</span>
+</div>
+
+<div class="controls">
+  <button class="ctrl-btn" onclick="toggleAll(true)">全部展开</button>
+  <button class="ctrl-btn" onclick="toggleAll(false)">全部折叠</button>
+  <button class="ctrl-btn" onclick="toggleAll(false); expandLevel(0); expandLevel(1);">展开两级</button>
+</div>
+
+<div class="container" id="tree"></div>
+
+<script>
+const data = {
+  text: "CITS4401 软件需求与设计 — 课程导论",
+  children: [
+    {
+      text: "一、课程概览 (Unit Overview)",
+      children: [
+        { text: "<strong>课程名称</strong>：CITS4401 Software Requirements and Design（软件需求与设计）" },
+        { text: "<strong>核心主旨</strong>：需求与设计是软件开发的关键阶段——需求或设计阶段的错误/误解在后期修复代价极高，甚至导致项目失败 <span class='tag tag-exam'>考试重点</span>" },
+        { text: "课程四大内容板块 <span class='tag tag-exam'>考试重点</span>", children: [
+          { text: "(1) <strong>需求工程</strong> (Requirements Engineering)：如何获取、分析、规格化和验证需求" },
+          { text: "(2) <strong>软件设计</strong> (Software Design)：如何将需求转化为可实现的系统结构" },
+          { text: "(3) <strong>软件架构</strong> (Software Architectures)：系统的高层组织方式和结构" },
+          { text: "(4) <strong>设计模式与惯用法</strong> (Design Patterns and Idioms)：可复用的解决方案模板" },
+        ]},
+        { text: "Unit Coordinator: Arran Stewart | 咨询时间: 周四 4pm, Math 2.21" },
+      ]
+    },
+    {
+      text: "二、软件工程 (Software Engineering)",
+      children: [
+        { text: "<strong>软件 (Software)</strong>：用于操作计算机和执行特定任务的指令、数据或程序的集合 <span class='tag tag-def'>定义</span>" },
+        { text: "<strong>工程 (Engineering)</strong>：运用系统化、科学化、定义明确的过程来生产高质量产品 <span class='tag tag-def'>定义</span>" },
+        { text: "<strong>软件工程 (SE)</strong> 的两个 ISO 标准定义 <span class='tag tag-def'>定义</span><span class='tag tag-exam'>考试重点</span>", children: [
+          { text: "ISO/IEC 2382:2015：将科学技术知识、方法和经验系统地应用于软件的设计、实现、测试和文档编写" },
+          { text: "ISO/IEC TR 19759:2016 (SWEBOK)：将系统化、规范化、可量化的方法应用于软件的开发、运维和维护——即将工程方法应用于软件" },
+        ]},
+        { text: "SE 的关键特性", children: [
+          { text: "SE 是一个<em>创造性</em>的过程——很少有绝对的对错" },
+          { text: "但某些需求和设计确实比其他的<em>好得多</em>" },
+          { text: "<strong>选择必须被评估和论证</strong>（Choices must be evaluated and justified）<span class='tag tag-exam'>考试重点</span>" },
+        ]},
+      ]
+    },
+    {
+      text: "三、需求 (Requirements)",
+      children: [
+        { text: "<strong>软件需求 (Software Requirement)</strong> — ISO 3.3847 <span class='tag tag-def'>定义</span><span class='tag tag-exam'>考试重点</span>", children: [
+          { text: "含义1：用户为解决问题或达成目标所需要的软件能力" },
+          { text: "含义2：系统或系统组件为满足合同、标准、规格说明或其他正式文件而必须具备的软件能力" },
+        ]},
+        { text: "<strong>软件需求分析 (Software Requirements Analysis)</strong> — ISO 3.3848 <span class='tag tag-def'>定义</span>", children: [
+          { text: "定义：研究用户需要以得出系统、硬件或软件需求定义的过程" },
+        ]},
+      ]
+    },
+    {
+      text: "四、设计 (Design)",
+      children: [
+        { text: "<strong>设计 (Design)</strong> — ISO 3.1125 <span class='tag tag-def'>定义</span><span class='tag tag-exam'>考试重点</span>", children: [
+          { text: "含义1 [过程]：定义系统的<em>架构、系统元素、接口</em>及其他特征的过程" },
+          { text: "含义2 [结果]：上述过程的产出物" },
+        ]},
+        { text: "设计既是一个<em>动词</em>（做设计的过程），也是一个<em>名词</em>（设计产物）" },
+      ]
+    },
+    {
+      text: "五、软件方法学 (Software Methodologies)",
+      children: [
+        { text: "<strong>方法学 (Methodology)</strong> — ISO 3.2438 <span class='tag tag-def'>定义</span>", children: [
+          { text: "PMBOK 定义：一个领域中从业者所使用的实践、技术、程序和规则的体系" },
+          { text: "ISO/IEC 24744:2014 定义：所遵循的过程规范 + 使用/生成的工作产品 + 涉及的人员和工具" },
+          { text: "Webster（Cockburn 引用）：一系列相关方法（即系统化程序）或技术" },
+        ]},
+        { text: "Cockburn 的核心观点 <span class='tag tag-tip'>建议</span>", children: [
+          { text: "\"每个组织都有一种方法学——它就是他们做业务的方式\"" },
+          { text: "\"你的方法学就是你经常做的一切事情来交付软件……你的团队约定的惯例\"" },
+        ]},
+        { text: "<strong>方法学的组成元素</strong>（Cockburn 模型）<span class='tag tag-exam'>考试重点</span>", children: [
+          { text: "过程 (Process)、里程碑 (Milestones)、团队价值观 (Team Values)" },
+          { text: "活动 (Activities)、团队 (Teams)、质量 (Quality)" },
+          { text: "产品 (Products)、技术 (Techniques)、角色 (Roles)" },
+          { text: "标准 (Standards)、工具 (Tools)、技能 (Skills)、个性 (Personality)" },
+        ]},
+      ]
+    },
+    {
+      text: "六、软件过程 (Software Processes)",
+      children: [
+        { text: "<strong>软件过程 (Software Process)</strong>：一组将输入工作产品转换为输出工作产品的相互关联的活动和任务 [SWEBOK p.8-2] <span class='tag tag-def'>定义</span><span class='tag tag-exam'>考试重点</span>" },
+        { text: "<strong>活动 (Activities)</strong>：人们如何度过他们的工作日——例如：规划、编程、测试、开会 [Cockburn] <span class='tag tag-def'>定义</span>" },
+        { text: "<strong>过程 (Process)</strong>：活动如何在时间上组合在一起，通常有前置和后置条件 <span class='tag tag-def'>定义</span>", children: [
+          { text: "例：设计评审在设计文件发送给参与者2天后进行，并产出一份建议列表 <span class='tag tag-case'>案例</span>" },
+        ]},
+      ]
+    },
+    {
+      text: "七、为什么要关注需求和设计？",
+      children: [
+        { text: "a. 每个项目都有<strong>不确定性</strong>——需求是应对不确定性的方式之一 <span class='tag tag-exam'>考试重点</span>" },
+        { text: "b. 工程师需要<strong>具体的工作目标</strong>——很多工程师难以处理模糊性" },
+        { text: "c. 核心需求（由贸易行为法暗示）：解决方案是否<strong>适合用途 (Fit-for-purpose)</strong>？" },
+        { text: "d. 一个完整的测试程序能证明需求已被满足——这是<strong>获得付款</strong>的有效工具" },
+      ]
+    },
+    {
+      text: "八、人、利益相关者与用户 (People, Stakeholders & Users)",
+      children: [
+        { text: "Cockburn 名言：\"人在设计软件这一事实是显而易见的，却常被忽视\" <span class='tag tag-tip'>建议</span>" },
+        { text: "软件工程既要解决技术问题，也要与他人<em>有效协作</em>" },
+        { text: "<strong>利益相关者 (Stakeholder)</strong> — ISO 3.3943 <span class='tag tag-def'>定义</span><span class='tag tag-exam'>考试重点</span>", children: [
+          { text: "定义：可能影响、被影响、或认为自己会被项目决策/活动/结果影响的个人、团体或组织" },
+          { text: "示例：终端用户、终端用户组织、支持者、开发者、生产者、培训者、维护者、处置者、采购者、供应商、监管机构、决策者" },
+          { text: "注意：不同利益相关者的利益可能相互冲突，甚至与系统本身冲突 <span class='tag tag-exam'>考试重点</span>" },
+        ]},
+        { text: "<strong>用户 (User)</strong> — ISO 3.3943 <span class='tag tag-def'>定义</span>", children: [
+          { text: "定义：与系统、产品或服务进行交互的人" },
+          { text: "示例：操作员、系统运行结果的接收者；银行客户（到网点、收纸质账单、电话银行等）" },
+        ]},
+        { text: "<strong>客户 (Customer)</strong> — ISO 3.970 <span class='tag tag-def'>定义</span>", children: [
+          { text: "定义：接收产品或服务的组织或个人——即\"付钱的人\"" },
+          { text: "客户可以是组织内部或外部的；客户是利益相关者的<em>子集</em>" },
+        ]},
+        { text: "<strong>参与者 (Actor)</strong> — UML 中的概念 <span class='tag tag-def'>定义</span>", children: [
+          { text: "定义：在系统外部与系统交互的人或事物" },
+          { text: "注意：明确哪个参与者发起了动作是很有价值的" },
+        ]},
+      ]
+    },
+    {
+      text: "九、用户故事 (User Stories)",
+      children: [
+        { text: "<strong>用户故事 (User Story)</strong>：用于捕捉\"原始\"用户需求的简短描述，在 SW 开发早期编写 <span class='tag tag-def'>定义</span><span class='tag tag-exam'>考试重点</span>" },
+        { text: "目的：阐明一项工作如何向客户交付特定<strong>价值</strong>" },
+        { text: "用户故事的四大好处 <span class='tag tag-tip'>建议</span>", children: [
+          { text: "<strong>保持用户聚焦</strong>：不是完成任务清单，而是为真实用户解决问题" },
+          { text: "<strong>促进协作</strong>：有了明确的终极目标，团队可以共同决定最佳方案" },
+          { text: "<strong>驱动创造性解决方案</strong>：鼓励团队批判性和创造性地思考" },
+          { text: "<strong>创造动力</strong>：每个故事完成都是一个小胜利，推动团队前进" },
+        ]},
+        { text: "<strong>标准格式</strong> <span class='tag tag-exam'>考试重点</span>", children: [
+          { text: "As a [角色] / I want [功能] / So that [业务价值]" },
+          { text: "例1：As Max, I want to invite my friends, so we can enjoy this service together <span class='tag tag-case'>案例</span>" },
+          { text: "例2：As a manager, I want to understand my colleagues' progress, so I can better report our success and failures <span class='tag tag-case'>案例</span>" },
+        ]},
+        { text: "用户故事的弱点与陷阱 <span class='tag tag-exam'>考试重点</span>", children: [
+          { text: "\"I want\" 后面经常跟着<em>预设的解决方案</em>而非真正的需求" },
+          { text: "真正的目标是阐述<strong>问题/需要</strong>，而非具体方案" },
+          { text: "反面案例：As a bank customer / I want online access / So that I can see my balance 24/7 → \"So that\" 只是在为解决方案辩护，不是真正的业务问题 <span class='tag tag-case'>案例</span>" },
+        ]},
+        { text: "<strong>业务故事 (Business Story)</strong> — 改进版本 <span class='tag tag-tip'>建议</span>", children: [
+          { text: "格式：As an [外部客户/实体] / I can [达成业务目标] / So that [对外部客户/实体/业务的价值]" },
+          { text: "改进案例：As a bank customer / I can have frequent and convenient connection with my account / So that I can feel confident that I always know my financial position <span class='tag tag-case'>案例</span>" },
+          { text: "来源：Robertson & Robertson, \"The User Story Considered Harmful\" (volere.org)" },
+        ]},
+        { text: "编写好用户故事的原则 <span class='tag tag-tip'>建议</span>", children: [
+          { text: "用户故事关注的是<strong>需要 (Needs)</strong>，即使不开发任何软件，这些需要也依然存在" },
+          { text: "用用户能理解的语言写，简洁到可以写在索引卡片上" },
+          { text: "敏捷方法中，<strong>测试人员</strong>参与审查用户故事以确保其合理/可测试——测试人员比开发人员更能代表真实用户" },
+        ]},
+      ]
+    },
+    {
+      text: "十、Volere Snow Card（需求捕获工具）",
+      children: [
+        { text: "<strong>Snow Card</strong>：Volere 提供的需求记录模板，用于结构化地捕捉需求 <span class='tag tag-def'>定义</span>" },
+        { text: "Snow Card 关键字段 <span class='tag tag-exam'>考试重点</span>", children: [
+          { text: "<strong>Requirement #</strong>：唯一标识号" },
+          { text: "<strong>Requirement Type</strong>：需求类型（来自模板分类）" },
+          { text: "<strong>Event/BUC/PUC #</strong>：关联的事件/用例编号" },
+          { text: "<strong>Description</strong>：需求意图的一句话描述" },
+          { text: "<strong>Rationale</strong>：需求的合理性论证" },
+          { text: "<strong>Source/Originator</strong>：谁提出了这个需求" },
+          { text: "<strong>Fit Criterion</strong>：用于测试解决方案是否符合原始需求的度量标准" },
+          { text: "<strong>Customer Satisfaction</strong>：如果成功实现，利益相关者满意度 (1=无所谓, 5=极其高兴)" },
+          { text: "<strong>Customer Dissatisfaction</strong>：如果不在最终产品中，利益相关者不满度 (1=无所谓, 5=极其不满)" },
+          { text: "<strong>Dependencies</strong>：依赖于此需求的其他需求列表" },
+          { text: "<strong>Conflicts</strong>：如果实现此需求则无法实现的其他需求" },
+          { text: "<strong>Supporting Materials</strong>：说明和解释该需求的参考文档" },
+          { text: "<strong>History</strong>：创建、修改、删除的历史记录" },
+        ]},
+        { text: "重要提示：不需要一次性填满所有字段！ <span class='tag tag-tip'>建议</span>" },
+      ]
+    },
+    {
+      text: "十一、SWEBOK 知识体系",
+      children: [
+        { text: "<strong>软件需求知识领域</strong>（SWEBOK V3.0 Fig 1.1）<span class='tag tag-exam'>考试重点</span>", children: [
+          { text: "软件需求基础 (Fundamentals)：定义、产品/过程需求、功能/非功能需求、涌现属性、可量化需求、系统需求 vs 软件需求" },
+          { text: "需求过程 (Requirements Process)：过程模型、过程参与者、过程支持与管理、过程质量与改进" },
+          { text: "需求获取 (Requirements Elicitation)：需求来源、获取技术" },
+          { text: "需求分析 (Requirements Analysis)：需求分类、概念建模、架构设计与需求分配、需求协商、形式化分析" },
+          { text: "需求规格说明 (Requirements Specification)：系统定义文档、系统需求规格说明、软件需求规格说明" },
+          { text: "需求验证 (Requirements Validation)：需求评审、原型验证、模型验证、验收测试" },
+          { text: "实践考量 (Practical Considerations)：迭代性、变更管理、需求属性、需求追溯、需求度量" },
+        ]},
+        { text: "<strong>软件设计知识领域</strong>（SWEBOK）<span class='tag tag-exam'>考试重点</span>", children: [
+          { text: "设计基础 (Fundamentals)：通用设计概念、设计上下文、设计过程、设计原则" },
+          { text: "设计关键问题 (Key Issues)：并发、控制与事件处理、数据持久化、组件分布、错误/异常处理、交互与表示、安全" },
+          { text: "软件结构与架构 (Structure & Architecture)：架构结构/视点、架构风格、设计模式、架构设计决策、程序族与框架" },
+          { text: "用户界面设计 (UI Design)：通用原则、UI 问题、交互模态设计、信息展示设计、UI 设计过程、本地化/国际化、隐喻与概念模型" },
+          { text: "设计质量分析与评估 (Quality Analysis)：质量属性、质量分析与评估技术、度量" },
+          { text: "设计表示法 (Notations)：结构描述（静态视图）、行为描述（动态视图）" },
+          { text: "设计策略与方法 (Strategies & Methods)：通用策略、面向功能/结构化设计、面向对象设计、以数据结构为中心的设计、基于组件的设计 (CBD)" },
+        ]},
+      ]
+    },
+    {
+      text: "十二、用例 vs 用户故事（注意区分）",
+      children: [
+        { text: "<strong>用例 (Use Case)</strong>：描述涉及某功能的所有可能场景的抽象，焦点是<em>完整性</em> <span class='tag tag-def'>定义</span>" },
+        { text: "UML 中有<em>用例图 (Use Case Diagram)</em> 和<em>用例描述 (Use Case)</em> 两个概念" },
+        { text: "用例将在后续课程中深入学习；本讲先关注<strong>用户故事</strong>" },
+        { text: "区别：用户故事 = 简短的需求片段（1-2句）；用例 = 完整的交互场景描述 <span class='tag tag-exam'>考试重点</span>" },
+      ]
+    },
+    {
+      text: "十三、课程考核 (Assessment)",
+      children: [
+        { text: "<strong>随堂测试 (Take-home Tests)</strong>：10% — 基于讲座和工作坊的个人测试，第5周和第9周 <span class='tag tag-data'>数据</span>" },
+        { text: "<strong>需求与设计小组项目 (Group Project)</strong>：35% — 两个交付物，第7周和第11周交，5人团队 <span class='tag tag-data'>数据</span>" },
+        { text: "<strong>期末考试 (Final Exam)</strong>：55% — 闭卷，基于讲座和工作坊内容 <span class='tag tag-data'>数据</span>" },
+      ]
+    },
+    {
+      text: "十四、总结 (Summary)",
+      children: [
+        { text: "软件工程是以<strong>人为中心</strong>的活动" },
+        { text: "<strong>利益相关者</strong>是对系统有利害关系的任何人——可能相互冲突" },
+        { text: "<strong>用户故事</strong>表达一个非常具体的用户需要，简短到1-2句话；关注需要本身，这些需要独立于任何软件" },
+        { text: "用户故事不能取代需求——两者都有助于<em>减少不确定性</em>" },
+        { text: "Volere Snow Card 是捕获需求（包括用户故事）的实用工具" },
+      ]
+    },
+    {
+      text: "十五、推荐阅读",
+      children: [
+        { text: "Pressman《Software Engineering》" },
+        { text: "Fowler《UML Distilled》" },
+        { text: "Cockburn《Agile Software Development》" },
+        { text: "Robertson & Robertson, volere.org — \"The User Story Considered Harmful\"" },
+        { text: "Atlassian: https://www.atlassian.com/agile/project-management/user-stories" },
+      ]
+    },
+  ]
+};
+
+let allNodes = [];
+
+function renderTree(node, level, parentEl) {
+  const div = document.createElement('div');
+  div.className = `node level-${level}` + (node.children ? '' : ' leaf');
+
+  const header = document.createElement('div');
+  header.className = 'node-header';
+
+  const toggle = document.createElement('span');
+  toggle.className = 'node-toggle';
+  toggle.textContent = node.children ? '−' : '•';
+
+  const text = document.createElement('span');
+  text.className = 'node-text';
+  text.innerHTML = node.text;
+
+  header.appendChild(toggle);
+  header.appendChild(text);
+  div.appendChild(header);
+
+  let childContainer = null;
+  if (node.children) {
+    childContainer = document.createElement('div');
+    childContainer.className = 'node-children';
+    node.children.forEach(c => renderTree(c, level + 1, childContainer));
+    div.appendChild(childContainer);
+
+    header.addEventListener('click', () => {
+      const collapsed = childContainer.classList.toggle('collapsed');
+      toggle.textContent = collapsed ? '+' : '−';
+    });
+  }
+
+  allNodes.push({ div, childContainer, toggle, level });
+  parentEl.appendChild(div);
+}
+
+function toggleAll(expand) {
+  allNodes.forEach(n => {
+    if (n.childContainer) {
+      if (expand) {
+        n.childContainer.classList.remove('collapsed');
+        n.toggle.textContent = '−';
+      } else {
+        n.childContainer.classList.add('collapsed');
+        n.toggle.textContent = '+';
+      }
+    }
+  });
+}
+
+function expandLevel(targetLevel) {
+  allNodes.forEach(n => {
+    if (n.childContainer && n.level <= targetLevel) {
+      n.childContainer.classList.remove('collapsed');
+      n.toggle.textContent = '−';
+    }
+  });
+}
+
+const tree = document.getElementById('tree');
+data.children.forEach(c => renderTree(c, 0, tree));
+</script>
+
+</body>
+</html>
