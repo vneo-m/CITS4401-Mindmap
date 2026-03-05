@@ -234,9 +234,36 @@
 
   strong { color: #111111; font-weight: 500; }
   em { font-style: normal; color: #0a7aaa; }
+
+  .back-btn {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: white;
+    border: 1px solid rgba(74, 144, 217, 0.3);
+    border-radius: 8px;
+    color: #2270b8;
+    font-size: 0.82em;
+    font-weight: 500;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.2s ease;
+  }
+  .back-btn:hover {
+    background: rgba(74, 144, 217, 0.08);
+    border-color: rgba(74, 144, 217, 0.5);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+  }
 </style>
 </head>
 <body>
+
+<a class="back-btn" href="../index.html">← Home</a>
 
 <div class="header">
   <h1>Optimisation and the Hypothesis Space — 优化与假设空间</h1>
