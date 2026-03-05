@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CITS5508 Machine Learning - Lecture 0 & 1 思维导图</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: #f0f4f8;
+    color: #1e2a3a;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .header {
+    text-align: center;
+    padding: 40px 20px 20px;
+    position: relative;
+  }
+
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #4a90d9, transparent);
+  }
+
+  .header h1 {
+    font-size: 1.6em;
+    font-weight: 700;
+    background: linear-gradient(135deg, #2270b8, #1a96c8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1px;
+  }
+
+  .header .subtitle {
+    font-size: 0.85em;
+    color: #5a6a80;
+    margin-top: 8px;
+    font-weight: 300;
+  }
+
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 16px 20px 8px;
+    font-size: 0.75em;
+    color: #5a6a80;
+    flex-wrap: wrap;
+  }
+
+  .legend span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .legend .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+  }
+
+  .node {
+    margin: 6px 0;
+    position: relative;
+  }
+
+  .node-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    user-select: none;
+  }
+
+  .node-header:hover {
+    background: rgba(74, 144, 217, 0.09);
+  }
+
+  .node-toggle {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    margin-top: 2px;
+    transition: all 0.2s ease;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+  }
+
+  .node-text {
+    flex: 1;
+    line-height: 1.6;
+    font-size: 0.9em;
+  }
+
+  .node-children {
+    margin-left: 26px;
+    border-left: 1px solid rgba(74, 144, 217, 0.22);
+    padding-left: 10px;
+    overflow: hidden;
+    transition: max-height 0.35s ease, opacity 0.25s ease;
+  }
+
+  .node-children.collapsed {
+    max-height: 0 !important;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .level-0 > .node-header {
+    background: linear-gradient(135deg, rgba(74, 144, 217, 0.12), rgba(126, 200, 227, 0.06));
+    border: 1px solid rgba(74, 144, 217, 0.28);
+    border-radius: 10px;
+    margin-bottom: 4px;
+  }
+
+  .level-0 > .node-header .node-text {
+    font-weight: 700;
+    font-size: 1.05em;
+    color: #111111;
+  }
+
+  .level-0 > .node-header .node-toggle {
+    background: rgba(74, 144, 217, 0.2);
+    color: #1a6fa0;
+  }
+
+  .level-1 > .node-header .node-text {
+    font-weight: 500;
+    color: #222222;
+  }
+
+  .level-1 > .node-header .node-toggle {
+    background: rgba(74, 144, 217, 0.12);
+    color: #3a6aa0;
+  }
+
+  .level-2 > .node-header .node-text {
+    color: #333333;
+    font-weight: 400;
+  }
+
+  .level-2 > .node-header .node-toggle {
+    background: rgba(74, 144, 217, 0.08);
+    color: #5a8ab8;
+  }
+
+  .level-3 > .node-header .node-text {
+    color: #555555;
+    font-weight: 300;
+    font-size: 0.85em;
+  }
+
+  .level-3 > .node-header .node-toggle {
+    background: rgba(74, 144, 217, 0.05);
+    color: #4a7a9b;
+  }
+
+  .leaf > .node-header .node-toggle {
+    background: none;
+    color: #aaaaaa;
+    font-size: 6px;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 4px;
+    font-size: 0.72em;
+    font-weight: 500;
+    margin-left: 6px;
+    vertical-align: middle;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .tag-def { background: rgba(100, 60, 190, 0.09); color: #5030a0; }
+  .tag-exam { background: rgba(180, 90, 0, 0.09); color: #a05010; }
+  .tag-data { background: rgba(0, 140, 90, 0.09); color: #007850; }
+  .tag-tip { background: rgba(160, 110, 0, 0.09); color: #806000; }
+  .tag-case { background: rgba(180, 30, 30, 0.09); color: #a02020; }
+  .tag-math { background: rgba(0, 90, 160, 0.09); color: #005090; }
+
+  .controls {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px 0 4px;
+  }
+
+  .ctrl-btn {
+    padding: 6px 16px;
+    border: 1px solid rgba(74, 144, 217, 0.3);
+    background: rgba(74, 144, 217, 0.08);
+    color: #2270b8;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.78em;
+    font-family: 'Noto Sans SC', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .ctrl-btn:hover {
+    background: rgba(74, 144, 217, 0.14);
+    border-color: rgba(74, 144, 217, 0.4);
+  }
+
+  strong { color: #111111; font-weight: 500; }
+  em { font-style: normal; color: #0a7aaa; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>CITS5508: Machine Learning — Lecture 0 & 1</h1>
+  <div class="subtitle">课程概览 + 机器学习导论 — 思维导图</div>
+</div>
+
+<div class="legend">
+  <span><span class="dot" style="background:#b89aff"></span>定义</span>
+  <span><span class="dot" style="background:#ffaa64"></span>考试重点</span>
+  <span><span class="dot" style="background:#64dcb4"></span>数据</span>
+  <span><span class="dot" style="background:#ffd64a"></span>实用建议</span>
+  <span><span class="dot" style="background:#ff8a8a"></span>案例</span>
+  <span><span class="dot" style="background:#4a90d9"></span>数学/公式</span>
+</div>
+
+<div class="controls">
+  <button class="ctrl-btn" onclick="toggleAll(true)">全部展开</button>
+  <button class="ctrl-btn" onclick="toggleAll(false)">全部折叠</button>
+  <button class="ctrl-btn" onclick="toggleAll(false); expandLevel(0); expandLevel(1);">展开两级</button>
+</div>
+
+<div class="container" id="tree"></div>
+
+<script>
+const data = {
+  text: "CITS5508 Machine Learning — 课程概览与机器学习导论",
+  children: [
+    {
+      text: "Part A：课程概览与行政事务 (Lecture 00)",
+      children: [
+        {
+          text: "一、课程简介 (Unit Description)",
+          children: [
+            { text: "<strong>课程名称</strong>：CITS5508 Machine Learning（机器学习）" },
+            { text: "<strong>核心目标</strong>：学习从数据中提取信息的算法，广泛应用于科学、工程、经济、健康等领域" },
+            { text: "这些算法也被称为从数据中\"学习\"——当<em>解析解不可行</em>且有<em>足够数据</em>时，构建经验性解决方案" },
+            { text: "课程主要聚焦于<strong>监督学习</strong>和<strong>无监督学习</strong>技术 <span class='tag tag-exam'>考试重点</span>" },
+          ]
+        },
+        {
+          text: "二、学习成果 (Learning Outcomes)",
+          children: [
+            { text: "解释机器学习在知识提取中的角色" },
+            { text: "解释监督学习与无监督学习算法的区别 <span class='tag tag-exam'>考试重点</span>" },
+            { text: "展示对算法化机器学习方法的系统性知识" },
+            { text: "为真实世界数据集实现机器学习解决方案的实际能力" },
+          ]
+        },
+        {
+          text: "三、课程内容范围",
+          children: [
+            { text: "<strong>包含</strong>：SVM、决策树、随机森林、聚类等 ML 技术；可能有行业嘉宾讲座" },
+            { text: "<strong>不包含</strong>：深度学习（有专门课程 CITS5017）；探索性数据分析（EDA，如数据清洗、可视化等，要求已掌握） <span class='tag tag-tip'>建议</span>" },
+          ]
+        },
+        {
+          text: "四、教学安排 (Unit Structure)",
+          children: [
+            { text: "<strong>授课</strong>：每周 1 次，1小时45分钟面授 + 录制，录像发布在 LMS" },
+            { text: "<strong>实验课</strong>：每周多个时段，配有助教辅导" },
+            { text: "<strong>答疑</strong>：周二 10am-11am（建议提前24小时邮件预约）" },
+            { text: "Coordinator: Dr Marcell Szikszai | Associate Professor Du Huynh" },
+          ]
+        },
+        {
+          text: "五、考核方式 (Assessment) <span class='tag tag-data'>数据</span>",
+          children: [
+            { text: "<strong>期中测试 (Mid-semester test)</strong>：10% — 第5周，闭卷面授 (3月27日 5pm) <span class='tag tag-data'>数据</span>" },
+            { text: "<strong>作业1 (Assignment 1)</strong>：20% — 截止4月18日 11:59pm <span class='tag tag-data'>数据</span>" },
+            { text: "<strong>作业2 (Assignment 2)</strong>：20% — 截止5月16日 11:59pm <span class='tag tag-data'>数据</span>" },
+            { text: "<strong>期末考试 (Final Exam)</strong>：50% — 6月考试期间，编程 + 开放式问题混合 <span class='tag tag-data'>数据</span>" },
+            { text: "作业为基于真实数据集的编程练习" },
+          ]
+        },
+        {
+          text: "六、软件工具 (Software)",
+          children: [
+            { text: "需要使用 <strong>Jupyter Notebooks</strong> + Python ML 包" },
+            { text: "核心库：scikit-learn、NumPy、pandas、matplotlib" },
+            { text: "环境选择：本地安装 或 Google Colaboratory <span class='tag tag-tip'>建议</span>" },
+          ]
+        },
+        {
+          text: "七、学习建议 (How to Succeed) <span class='tag tag-tip'>建议</span>",
+          children: [
+            { text: "每6学分单元预期总学习量为<strong>150小时</strong> <span class='tag tag-data'>数据</span>" },
+            { text: "讲座只提供约 <strong>1/3</strong> 的必要阅读——需要大量课外自学 <span class='tag tag-tip'>建议</span>" },
+            { text: "做实验练习、参加实验课、尽早提问" },
+            { text: "Academic Skills Centre 提供数学复习工作坊（函数、线性代数、微积分、优化）" },
+          ]
+        },
+        {
+          text: "八、数学复习工作坊 (Maths Review)",
+          children: [
+            { text: "Topic 1：函数（代数、数学符号、对数、反函数、定义域/值域）" },
+            { text: "Topic 2：线性代数基础（向量、矩阵）" },
+            { text: "Topic 3：微积分（求导规则与应用）" },
+            { text: "Topic 4：优化（求最小/最大值、凸性、梯度下降）<span class='tag tag-exam'>考试重点</span>" },
+          ]
+        },
+        {
+          text: "九、教材 (Reading)",
+          children: [
+            { text: "<strong>Hands-on Machine Learning with Scikit-Learn & TensorFlow</strong>, Aurélien Géron, O'Reilly 2022" },
+            { text: "通过 UWA OneSearch 可在线获取" },
+            { text: "示例代码：https://github.com/ageron/handson-ml3" },
+          ]
+        },
+      ]
+    },
+    {
+      text: "Part B：机器学习导论 (Lecture 01)",
+      children: [
+        {
+          text: "一、什么是机器学习 (What is ML)?",
+          children: [
+            { text: "<strong>机器学习</strong>：对计算机进行编程使其能从数据中学习的科学（和艺术）<span class='tag tag-def'>定义</span><span class='tag tag-exam'>考试重点</span>" },
+            { text: "ML 也称为<strong>归纳学习 (Inductive Learning)</strong>：一种逻辑推理形式，从特定实例集得出通用结论 <span class='tag tag-def'>定义</span>" },
+            { text: "<strong>Arthur Samuel (1959)</strong> 定义：赋予计算机无需被显式编程就能学习的能力 <span class='tag tag-def'>定义</span>" },
+            { text: "<strong>Tom Mitchell (1997)</strong> 定义：如果程序在任务 T 上、以性能度量 P 衡量、随着经验 E 的增加而改善，则称该程序从经验 E 中学习 <span class='tag tag-def'>定义</span><span class='tag tag-exam'>考试重点</span>" },
+            { text: "日常 ML 例子：垃圾邮件过滤、Spotify 推荐 <span class='tag tag-case'>案例</span>" },
+          ]
+        },
+        {
+          text: "二、Mitchell 定义拆解 — 垃圾邮件过滤器案例 <span class='tag tag-case'>案例</span>",
+          children: [
+            { text: "<strong>经验 E</strong>：垃圾邮件样本（用户标记）+ 正常邮件样本" },
+            { text: "<strong>任务 T</strong>：判断新邮件是垃圾邮件还是正常邮件" },
+            { text: "<strong>性能度量 P</strong>：过滤器正确分类邮件的能力——例如<em>准确率 (Accuracy)</em>，即正确分类的邮件比例 <span class='tag tag-exam'>考试重点</span>" },
+            { text: "P 的选择取决于具体问题 <span class='tag tag-tip'>建议</span>" },
+          ]
+        },
+        {
+          text: "三、监督学习 (Supervised Learning) <span class='tag tag-exam'>考试重点</span>",
+          children: [
+            { text: "<strong>监督学习</strong>：从历史标注样本中学习模型，然后用该模型对新样本进行预测 <span class='tag tag-def'>定义</span>" },
+            { text: "核心流程：训练集 → ML 算法 → 分类器/模型 → 对新查询输出标签" },
+            { text: "关键术语 <span class='tag tag-def'>定义</span>", children: [
+              { text: "<strong>属性/特征 (Attribute/Feature)</strong>：描述样本某个方面的特征，也叫预测变量、自变量" },
+              { text: "<strong>样本/实例 (Example/Instance)</strong>：由属性值元组描述的感兴趣对象（如一封邮件、一个患者记录）" },
+              { text: "<strong>标签/目标 (Label/Target)</strong>：描述感兴趣现象的特殊属性——ML 算法要学习预测的对象" },
+              { text: "分类任务中标签是离散集合 {L₁, L₂, ..., Lₖ}；回归任务中标签是实数值" },
+            ]},
+            { text: "<strong>数据集 (Data Set)</strong> 的形式化表示 <span class='tag tag-math'>数学</span>", children: [
+              { text: "数据集 D 包含 n 个样本、m 个属性：行 Dᵢ = (xᵢ₁, xᵢ₂, ..., xᵢₘ, yᵢ) = (x⃗ᵢ, yᵢ)" },
+              { text: "xᵢⱼ 表示第 i 个样本的第 j 个属性值" },
+            ]},
+            { text: "监督学习的分类 <span class='tag tag-exam'>考试重点</span>", children: [
+              { text: "<strong>分类 (Classification)</strong>：目标变量是离散类别（如垃圾邮件/正常邮件）" },
+              { text: "<strong>回归 (Regression)</strong>：目标变量是连续实数值（如房价预测）" },
+            ]},
+          ]
+        },
+        {
+          text: "四、学习过程的形式化框架 <span class='tag tag-exam'>考试重点</span>",
+          children: [
+            { text: "<strong>输入 x⃗</strong>：用于做决策的信息（如客户的薪资、居住年限等）" },
+            { text: "<strong>未知目标函数 f : X → Y</strong>：理想的映射关系（如理想的信用审批函数）" },
+            { text: "<strong>数据集 D</strong>：包含所有输入-输出样例 (x⃗ᵢ, yᵢ)" },
+            { text: "<strong>学习算法</strong>利用 D 找到函数 g : X → Y 来近似 f" },
+            { text: "<strong>假设空间 H</strong>：算法考虑的候选函数集合（如所有线性函数集合）<span class='tag tag-def'>定义</span>" },
+            { text: "学习的四个组成部分 <span class='tag tag-exam'>考试重点</span>", children: [
+              { text: "① 目标函数 f : X → Y" },
+              { text: "② 训练样例 (x⃗₁, y₁), (x⃗₂, y₂), ..., (x⃗ₙ, yₙ)" },
+              { text: "③ 学习模型 = 学习算法 + 假设空间 H" },
+              { text: "④ 最终假设 g ≈ f" },
+            ]},
+          ]
+        },
+        {
+          text: "五、简单分类模型示例 — 信用审批 <span class='tag tag-case'>案例</span><span class='tag tag-math'>数学</span>",
+          children: [
+            { text: "输入空间 X = ℝᵐ（m 维欧几里得空间），输出空间 Y = {-1, +1}（二分类）" },
+            { text: "模型对每个属性赋予<strong>权重</strong> w₁, w₂, ..., wₘ，代表各属性的相对重要性" },
+            { text: "决策规则：当 Σ wᵢxᵢ > threshold 时批准，否则拒绝 <span class='tag tag-math'>数学</span>" },
+            { text: "形式化表示：h(x⃗) = sgn(Σ wᵢxᵢ + b)，其中 b 为偏置项 <span class='tag tag-math'>数学</span>", children: [
+              { text: "sgn(x) = +1 (x > 0) 表示批准，sgn(x) = -1 (x < 0) 表示拒绝" },
+              { text: "权重 w₁...wₘ 和偏置 b 是<strong>可训练参数</strong>" },
+              { text: "信用批准条件：Σ wᵢxᵢ > -b" },
+            ]},
+            { text: "最终模型 g ∈ H 由最优权重和偏置决定" },
+          ]
+        },
+        {
+          text: "六、监督学习算法一览（课程将涵盖）",
+          children: [
+            { text: "<strong>线性回归 (Linear Regression)</strong>" },
+            { text: "<strong>逻辑回归 (Logistic Regression)</strong>" },
+            { text: "<strong>k-近邻 (k-Nearest Neighbors)</strong>" },
+            { text: "<strong>支持向量机 (SVMs)</strong>" },
+            { text: "<strong>决策树与随机森林 (Decision Trees & Random Forests)</strong>" },
+          ]
+        },
+        {
+          text: "七、无监督学习 (Unsupervised Learning) <span class='tag tag-exam'>考试重点</span>",
+          children: [
+            { text: "<strong>无监督学习</strong>：训练数据<em>没有标签</em>，算法自行发现数据中的结构和模式 <span class='tag tag-def'>定义</span>" },
+            { text: "<strong>聚类 (Clustering)</strong>：将数据分成若干组，同组内相似度高 <span class='tag tag-def'>定义</span>", children: [
+              { text: "k-means 聚类" },
+              { text: "DBSCAN（基于密度的聚类）" },
+              { text: "层次聚类分析 (HCA)" },
+            ]},
+            { text: "<strong>异常检测 (Anomaly Detection)</strong>：学习\"正常\"数据的模式，用于检测异常实例 <span class='tag tag-def'>定义</span>" },
+            { text: "<strong>可视化与降维</strong>", children: [
+              { text: "主成分分析 (PCA)" },
+              { text: "局部线性嵌入 (LLE)" },
+              { text: "t-SNE" },
+            ]},
+            { text: "<strong>关联规则学习</strong>：Apriori 算法、Eclat 算法" },
+          ]
+        },
+        {
+          text: "八、ML 系统的其他分类维度",
+          children: [
+            { text: "<strong>按泛化方式</strong> <span class='tag tag-exam'>考试重点</span>", children: [
+              { text: "<strong>基于实例的学习 (Instance-based)</strong>：\"记住\"训练样例，通过<em>相似度度量</em>对新实例进行泛化 <span class='tag tag-def'>定义</span>" },
+              { text: "<strong>基于模型的学习 (Model-based)</strong>：从训练样例构建模型，用模型进行预测 <span class='tag tag-def'>定义</span>" },
+            ]},
+            { text: "<strong>按训练方式</strong>", children: [
+              { text: "<strong>批量学习 (Batch Learning)</strong> vs <strong>在线学习 (Online Learning)</strong>：是否能增量式学习" },
+              { text: "监督 / 半监督 / 无监督 / 强化学习" },
+            ]},
+            { text: "这些分类不互斥，可以组合 <span class='tag tag-tip'>建议</span>" },
+          ]
+        },
+        {
+          text: "九、机器学习的主要挑战 <span class='tag tag-exam'>考试重点</span>",
+          children: [
+            { text: "<strong>训练数据不足</strong>：数据量太少无法有效学习" },
+            { text: "<strong>数据不具代表性或质量差</strong>：训练集不能反映真实分布" },
+            { text: "<strong>不相关特征</strong>：噪声特征干扰学习" },
+            { text: "<strong>过拟合 (Overfitting)</strong>：模型过于复杂，在训练集上表现好但泛化差 <span class='tag tag-def'>定义</span><span class='tag tag-exam'>考试重点</span>", children: [
+              { text: "示例：15次多项式拟合（MSE = 1.83e+08），模型学到了噪声而非真实模式 <span class='tag tag-case'>案例</span>" },
+            ]},
+            { text: "<strong>欠拟合 (Underfitting)</strong>：模型过于简单，无法捕捉数据的真实结构 <span class='tag tag-def'>定义</span><span class='tag tag-exam'>考试重点</span>", children: [
+              { text: "示例：1次线性拟合（MSE = 4.08e-01），直线无法拟合曲线数据 <span class='tag tag-case'>案例</span>" },
+            ]},
+            { text: "理想状态：适度复杂度（如4次多项式，MSE = 4.32e-02）<span class='tag tag-case'>案例</span>" },
+          ]
+        },
+        {
+          text: "十、测试与验证 (Testing & Validation) <span class='tag tag-exam'>考试重点</span>",
+          children: [
+            { text: "评估 ML 模型性能至关重要——必须知道模型在<em>未见数据</em>上表现如何" },
+            { text: "<strong>训练集/测试集拆分</strong>：常见比例为 80% 训练 / 20% 测试 <span class='tag tag-data'>数据</span>" },
+            { text: "<strong>泛化误差 (Generalisation Error)</strong>：也叫<em>样本外误差 (Out-of-sample Error)</em>，即在测试集上的错误率 <span class='tag tag-def'>定义</span>" },
+            { text: "<strong>验证集 (Validation Set)</strong>：因为用测试集选超参数会导致对测试集过拟合，所以还需要一个验证集 <span class='tag tag-exam'>考试重点</span>" },
+          ]
+        },
+        {
+          text: "十一、总结 (Summary)",
+          children: [
+            { text: "ML 让机器通过<strong>从数据中学习</strong>来改善任务表现，而非显式编写规则" },
+            { text: "ML 系统类型多样：监督/无监督、批量/在线、基于实例/基于模型 ..." },
+            { text: "ML 项目流程：收集数据 → 构建训练集 → 喂给学习算法 → 得到模型 → 在新数据上预测" },
+            { text: "训练集太小、数据不具代表性、有噪声、特征不相关都会导致差表现" },
+            { text: "模型<strong>既不能太简单（欠拟合）也不能太复杂（过拟合）</strong> <span class='tag tag-exam'>考试重点</span>" },
+          ]
+        },
+      ]
+    },
+    {
+      text: "推荐阅读",
+      children: [
+        { text: "Géron《Hands-on ML with Scikit-Learn & TensorFlow》Chapter 1: The Machine Learning Landscape" },
+        { text: "配套 Jupyter Notebook: https://github.com/ageron/handson-ml3/blob/main/01_the_machine_learning_landscape.ipynb" },
+      ]
+    },
+  ]
+};
+
+let allNodes = [];
+
+function renderTree(node, level, parentEl) {
+  const div = document.createElement('div');
+  div.className = `node level-${level}` + (node.children ? '' : ' leaf');
+
+  const header = document.createElement('div');
+  header.className = 'node-header';
+
+  const toggle = document.createElement('span');
+  toggle.className = 'node-toggle';
+  toggle.textContent = node.children ? '−' : '•';
+
+  const text = document.createElement('span');
+  text.className = 'node-text';
+  text.innerHTML = node.text;
+
+  header.appendChild(toggle);
+  header.appendChild(text);
+  div.appendChild(header);
+
+  let childContainer = null;
+  if (node.children) {
+    childContainer = document.createElement('div');
+    childContainer.className = 'node-children';
+    node.children.forEach(c => renderTree(c, level + 1, childContainer));
+    div.appendChild(childContainer);
+
+    header.addEventListener('click', () => {
+      const collapsed = childContainer.classList.toggle('collapsed');
+      toggle.textContent = collapsed ? '+' : '−';
+    });
+  }
+
+  allNodes.push({ div, childContainer, toggle, level });
+  parentEl.appendChild(div);
+}
+
+function toggleAll(expand) {
+  allNodes.forEach(n => {
+    if (n.childContainer) {
+      if (expand) {
+        n.childContainer.classList.remove('collapsed');
+        n.toggle.textContent = '−';
+      } else {
+        n.childContainer.classList.add('collapsed');
+        n.toggle.textContent = '+';
+      }
+    }
+  });
+}
+
+function expandLevel(targetLevel) {
+  allNodes.forEach(n => {
+    if (n.childContainer && n.level <= targetLevel) {
+      n.childContainer.classList.remove('collapsed');
+      n.toggle.textContent = '−';
+    }
+  });
+}
+
+const tree = document.getElementById('tree');
+data.children.forEach(c => renderTree(c, 0, tree));
+</script>
+
+</body>
+</html>
