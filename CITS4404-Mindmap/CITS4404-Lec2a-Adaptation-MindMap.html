@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CITS4404 - Part 2: Adaptation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: #f0f4f8;
+    color: #1e2a3a;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .header {
+    text-align: center;
+    padding: 40px 20px 20px;
+    position: relative;
+  }
+
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #4a90d9, transparent);
+  }
+
+  .header h1 {
+    font-size: 1.6em;
+    font-weight: 700;
+    background: linear-gradient(135deg, #2270b8, #1a96c8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1px;
+  }
+
+  .header .subtitle {
+    font-size: 0.85em;
+    color: #5a6a80;
+    margin-top: 8px;
+    font-weight: 300;
+  }
+
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 16px 20px 8px;
+    font-size: 0.75em;
+    color: #5a6a80;
+    flex-wrap: wrap;
+  }
+
+  .legend span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .legend .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+  }
+
+  .node {
+    margin: 6px 0;
+    position: relative;
+  }
+
+  .node-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    user-select: none;
+  }
+
+  .node-header:hover {
+    background: rgba(74, 144, 217, 0.09);
+  }
+
+  .node-toggle {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    margin-top: 2px;
+    transition: all 0.2s ease;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+  }
+
+  .node-text {
+    flex: 1;
+    line-height: 1.6;
+    font-size: 0.9em;
+  }
+
+  .node-children {
+    margin-left: 26px;
+    border-left: 1px solid rgba(74, 144, 217, 0.22);
+    padding-left: 10px;
+    overflow: hidden;
+    transition: max-height 0.35s ease, opacity 0.25s ease;
+  }
+
+  .node-children.collapsed {
+    max-height: 0 !important;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .level-0 > .node-header {
+    background: linear-gradient(135deg, rgba(74, 144, 217, 0.12), rgba(126, 200, 227, 0.06));
+    border: 1px solid rgba(74, 144, 217, 0.28);
+    border-radius: 10px;
+    margin-bottom: 4px;
+  }
+
+  .level-0 > .node-header .node-text {
+    font-weight: 700;
+    font-size: 1.05em;
+    color: #111111;
+  }
+
+  .level-0 > .node-header .node-toggle {
+    background: rgba(74, 144, 217, 0.2);
+    color: #1a6fa0;
+  }
+
+  .level-1 > .node-header .node-text {
+    font-weight: 500;
+    color: #222222;
+  }
+
+  .level-1 > .node-header .node-toggle {
+    background: rgba(74, 144, 217, 0.12);
+    color: #3a6aa0;
+  }
+
+  .level-2 > .node-header .node-text {
+    color: #333333;
+    font-weight: 400;
+  }
+
+  .level-2 > .node-header .node-toggle {
+    background: rgba(74, 144, 217, 0.08);
+    color: #5a8ab8;
+  }
+
+  .level-3 > .node-header .node-text {
+    color: #555555;
+    font-weight: 300;
+    font-size: 0.85em;
+  }
+
+  .level-3 > .node-header .node-toggle {
+    background: rgba(74, 144, 217, 0.05);
+    color: #4a7a9b;
+  }
+
+  .leaf > .node-header .node-toggle {
+    background: none;
+    color: #aaaaaa;
+    font-size: 6px;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 4px;
+    font-size: 0.72em;
+    font-weight: 500;
+    margin-left: 6px;
+    vertical-align: middle;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .tag-concept { background: rgba(100, 60, 190, 0.09); color: #5030a0; }
+  .tag-key { background: rgba(180, 90, 0, 0.09); color: #a05010; }
+  .tag-example { background: rgba(0, 140, 90, 0.09); color: #007850; }
+  .tag-think { background: rgba(160, 110, 0, 0.09); color: #806000; }
+  .tag-term { background: rgba(180, 30, 30, 0.09); color: #a02020; }
+  .tag-field { background: rgba(50, 100, 180, 0.09); color: #2050a0; }
+
+  .controls {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px 0 4px;
+  }
+
+  .ctrl-btn {
+    padding: 6px 16px;
+    border: 1px solid rgba(74, 144, 217, 0.3);
+    background: rgba(74, 144, 217, 0.08);
+    color: #2270b8;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.78em;
+    font-family: 'Noto Sans SC', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .ctrl-btn:hover {
+    background: rgba(74, 144, 217, 0.14);
+    border-color: rgba(74, 144, 217, 0.4);
+  }
+
+  strong { color: #111111; font-weight: 500; }
+  em { font-style: normal; color: #0a7aaa; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Part 2: Adaptation — 自适应</h1>
+  <div class="subtitle">CITS4404 AI and Adaptive Systems — 思维导图 | © Siwen Luo, UWA</div>
+</div>
+
+<div class="legend">
+  <span><span class="dot" style="background:#b89aff"></span>核心概念</span>
+  <span><span class="dot" style="background:#ffaa64"></span>重点</span>
+  <span><span class="dot" style="background:#64dcb4"></span>例子</span>
+  <span><span class="dot" style="background:#ffd64a"></span>思考题</span>
+  <span><span class="dot" style="background:#ff8a8a"></span>术语</span>
+  <span><span class="dot" style="background:#8ab4f0"></span>子领域</span>
+</div>
+
+<div class="controls">
+  <button class="ctrl-btn" onclick="toggleAll(true)">全部展开</button>
+  <button class="ctrl-btn" onclick="toggleAll(false)">全部折叠</button>
+  <button class="ctrl-btn" onclick="toggleAll(false); expandLevel(0); expandLevel(1);">展开两级</button>
+</div>
+
+<div class="container" id="tree"></div>
+
+<script>
+const data = {
+  text: "CITS4404 AI and Adaptive Systems — Part 2: Adaptation",
+  children: [
+    {
+      text: "一、AI 的工程视角：为什么需要\"自适应系统\"？",
+      children: [
+        { text: "研究人类智能本身固然迷人，但很多人的目标是让计算机做更多<em>有用的、超越现有能力的、很酷的</em>事情" },
+        { text: "这是一种<strong>工程视角</strong>（engineering view）——本课程主要采取这个视角 <span class='tag tag-key'>重点</span>" },
+        { text: "核心问题：OK，但为什么还要叫\"自适应系统\"？ <span class='tag tag-think'>思考题</span>" },
+      ]
+    },
+    {
+      text: "二、传统 AI 的局限：\"干净\"的 AI (Crisp, Clean AI)",
+      children: [
+        { text: "<strong>确定性 AI 的特点</strong> <span class='tag tag-concept'>核心概念</span>", children: [
+          { text: "明确描述的<em>状态</em> (well described states)" },
+          { text: "明确定义的<em>动作</em>将状态转移 (well-defined actions)" },
+          { text: "<em>目标状态</em> (goal state) 和 <em>效用函数</em> (utility function)" },
+          { text: "<em>确定性搜索</em> (deterministic search)" },
+        ]},
+        { text: "在<strong>人工世界</strong>（游戏、Shakey 机器人的受控环境）中效果很好 <span class='tag tag-example'>例子</span>" },
+        { text: "但<strong>现实世界不像棋盘——它是\"混乱的\"</strong> <span class='tag tag-key'>重点</span>", children: [
+          { text: "需要处理<em>不确定性、模糊性、未知</em> (uncertainty, ambiguity, unknown)" },
+          { text: "需要处理<em>不断变化的世界</em> (changing world)" },
+          { text: "需要处理<em>近似</em> (approximation)——不需要精确解" },
+          { text: "需要<em>柔韧性</em>而非脆弱性 (pliant vs brittle) <span class='tag tag-term'>术语</span>" },
+          { text: "需要<em>优雅退化</em> (graceful degradation)：性能逐渐下降而不是突然崩溃 <span class='tag tag-term'>术语</span>" },
+        ]},
+        { text: "传统计算在这些方面表现非常差！" },
+      ]
+    },
+    {
+      text: "三、向自然学习：适应的灵感来源 (Inspiration from Nature)",
+      children: [
+        { text: "<strong>自然界非常擅长应对不确定性、变化和近似</strong> <span class='tag tag-key'>重点</span>" },
+        { text: "核心思路：<em>从自然中汲取经验，将其引入计算！</em> (take lessons from nature, bring them into computing!) <span class='tag tag-concept'>核心概念</span>" },
+        { text: "自然界最关键的特质：<strong>适应能力</strong>——能够适应不断变化的、涌现的环境" },
+        { text: "<strong>自然界的适应案例</strong> <span class='tag tag-example'>例子</span>", children: [
+          { text: "南极鱼：血液中含有\"防冻\"蛋白质（生化层面的长期进化适应）" },
+          { text: "墨鱼：毫秒内改变皮肤颜色和纹理融入环境（短期实时物理适应）" },
+          { text: "袋鼠鼠：从食物中获取全部水分，完美适应沙漠（代谢层面进化适应）" },
+          { text: "木蛙：冬季可以冻结身体，春天\"复活\"（极端生理适应）" },
+        ]},
+      ]
+    },
+    {
+      text: "四、自然界的适应机制 (Mechanisms of Adaptation)",
+      children: [
+        { text: "学习和进化是两大主要机制，但实际远比这复杂 <span class='tag tag-concept'>核心概念</span>" },
+        { text: "<strong>两个分析轴</strong>", children: [
+          { text: "轴 1 — <em>时间跨度</em> (Timespan)：短期（个体生命周期）⇔ 长期（物种，千年）" },
+          { text: "轴 2 — <em>范围</em> (Scope)：个体 ⇔ 种群" },
+        ]},
+        { text: "<strong>短期机制</strong>", children: [
+          { text: "<strong>学习 (Learning)</strong>：个体层面、生命周期内 <span class='tag tag-term'>术语</span>", children: [
+            { text: "语言和文字的发明扩展了学习——可跨群体、跨生命周期传递知识" },
+            { text: "这被认为是<em>人类区别于其他动物的关键特征之一</em>" },
+            { text: "对应计算：<em>机器学习的训练过程、迁移学习、知识蒸馏</em>" },
+          ]},
+          { text: "<strong>身体适应 (Physical Adaptation)</strong>：饮食、训练等 <span class='tag tag-term'>术语</span>", children: [
+            { text: "主要是个体层面，但存在代际传递（健康的父母→健康的孩子）" },
+          ]},
+        ]},
+        { text: "<strong>长期机制</strong>", children: [
+          { text: "<strong>进化 (Evolution)</strong>：物种层面，时间跨度以千年计 <span class='tag tag-term'>术语</span>", children: [
+            { text: "通过自然选择，适应环境的个体更可能生存繁衍" },
+            { text: "技术正在改变进化进程：基因图谱绘制、基因修改、基因治疗" },
+            { text: "对应计算：<em>进化算法（遗传算法、遗传编程等）</em>" },
+          ]},
+        ]},
+        { text: "<strong>短期+长期机制</strong>", children: [
+          { text: "<strong>集体行为与涌现行为 (Collective/Emergent Behaviour)</strong> <span class='tag tag-concept'>核心概念</span>", children: [
+            { text: "发生在种群层面" },
+            { text: "短期：分工协作、飞行编队等" },
+            { text: "长期：蜜蜂蜂巢、蚁群觅食路径、鸟群编队……以及人类社会" },
+            { text: "<em>社会行为的寿命超越个体</em> (social behaviour outlives individuals)" },
+            { text: "整体行为不是任何单个个体\"计划\"出来的，而是从局部交互中<em>涌现</em>出来的 <span class='tag tag-key'>重点</span>" },
+            { text: "对应计算：<em>群体智能算法（蚁群优化、粒子群优化等）</em>" },
+          ]},
+        ]},
+      ]
+    },
+    {
+      text: "五、重新定义\"智能\"：非人类中心的视角",
+      children: [
+        { text: "也许人类的符号推理能力并不能解答一切问题 <span class='tag tag-think'>思考题</span>" },
+        { text: "<strong>替代性智能定义</strong>：在个体/群体所处的环境中，发展出生存和繁荣所需能力的过程 <span class='tag tag-concept'>核心概念</span>" },
+        { text: "EGO（人类中心）vs ECO（生态视角）：人类不再站在所有生物之上，而是网络中平等的一员" },
+        { text: "这个视角的转变对 AI 研究意义深远——蚂蚁、蜜蜂等也展现了某种\"智能\"，其策略可启发计算方法 <span class='tag tag-key'>重点</span>" },
+      ]
+    },
+    {
+      text: "六、从\"智能\"到自适应系统——计算领域的范式转移",
+      children: [
+        { text: "代表了一种根本性的计算思维变革 <span class='tag tag-key'>重点</span>", children: [
+          { text: "从\"精确编程告诉计算机每一步做什么\"→\"让计算系统自己学习和适应\"" },
+        ]},
+        { text: "这个领域有多个名称，核心思想相同：<em>用受生物启发的方法解决传统方法难以应对的复杂问题</em>" },
+      ]
+    },
+    {
+      text: "七、别名一：计算智能 (Computational Intelligence, CI) <span class='tag tag-field'>子领域</span>",
+      children: [
+        { text: "IEEE 计算智能学会定义：基于<em>生物和语言学启发</em>的计算范式的理论、设计、应用和开发 <span class='tag tag-concept'>核心概念</span>" },
+        { text: "<strong>三大传统支柱</strong> <span class='tag tag-key'>重点</span>", children: [
+          { text: "<strong>神经网络 (Neural Networks)</strong>：模拟大脑中神经元的连接和信号传递" },
+          { text: "<strong>模糊系统 (Fuzzy Systems)</strong>：处理模糊、不精确的信息" },
+          { text: "<strong>进化计算 (Evolutionary Computation)</strong>：模拟生物进化过程来搜索最优解" },
+        ]},
+        { text: "术语约 1990 年提出，但核心组成部分可追溯到 1940 年代" },
+        { text: "CI 使用<em>不精确和不完整的知识</em>，以<em>自适应方式</em>产生控制行为" },
+        { text: "CI 系统<strong>不使用传统 AI 意义上的知识</strong>（不依赖手工编写的规则），而从数据中自动学习 <span class='tag tag-key'>重点</span>" },
+      ]
+    },
+    {
+      text: "八、别名二：自然启发计算 (Nature-Inspired Computing) <span class='tag tag-field'>子领域</span>",
+      children: [
+        { text: "包含三类方法 <span class='tag tag-concept'>核心概念</span>", children: [
+          { text: "1) 从自然获取灵感开发新的问题解决技术（最常见，如遗传算法、蚁群优化）" },
+          { text: "2) 使用计算机模拟自然现象（如人工生命、生态系统模拟）" },
+          { text: "3) 使用自然材料进行计算（如 DNA 计算、量子计算）" },
+        ]},
+        { text: "本课程主要关注第 1 类：\"从自然到计算\"" },
+        { text: "抽象的自然现象包括：自我复制、大脑功能、达尔文进化、群体行为、免疫系统等" },
+      ]
+    },
+    {
+      text: "九、别名三：软计算 (Soft Computing) <span class='tag tag-field'>子领域</span>",
+      children: [
+        { text: "与\"硬计算\"（精确、确定性）相对：接受不精确、不确定和近似的解 <span class='tag tag-concept'>核心概念</span>" },
+        { text: "两大分支：<em>近似推理</em> (Approximate Reasoning) + <em>函数逼近/随机搜索</em> (Functional Approximation/Randomized Search)" },
+        { text: "智能机器的四个基本特征：鲁棒性 (robust)、自适应性 (adaptive)、自主性 (autonomous)、通信能力 (communicative)" },
+      ]
+    },
+    {
+      text: "十、别名四（讲师首选）：自适应系统 (Adaptive Systems) <span class='tag tag-field'>子领域</span>",
+      children: [
+        { text: "<strong>自适应系统</strong>：一组相互作用的实体，构成整体，能够共同<em>响应环境变化</em> <span class='tag tag-concept'>核心概念</span><span class='tag tag-term'>术语</span>" },
+        { text: "<strong>复杂自适应系统 (Complex Adaptive System, CAS)</strong> <span class='tag tag-concept'>核心概念</span>", children: [
+          { text: "整体行为<em>可能无法根据组成部分的行为来预测</em>" },
+          { text: "个体和集体行为根据触发事件而<em>变异和自组织</em>" },
+          { text: "包含正反馈（放大）和负反馈（抑制）机制" },
+        ]},
+        { text: "核心特征：<strong>涌现行为 (Emergent Behaviour)</strong>——从局部交互中自发产生的全局有序行为 <span class='tag tag-key'>重点</span>" },
+      ]
+    },
+    {
+      text: "十一、本课程重点的子领域 <span class='tag tag-key'>重点</span>",
+      children: [
+        { text: "软计算的分支体系中，本课程重点（绿色圈出）：", children: [
+          { text: "<strong>人工神经网络 (Artificial Neural Networks)</strong> <span class='tag tag-field'>子领域</span>", children: [
+            { text: "深度学习/CNN 只是其中一个子类（滤波器组）" },
+            { text: "本课程从更基础、更广泛的角度讲解" },
+            { text: "深度学习有专门课程 CITS5017" },
+          ]},
+          { text: "<strong>进化计算 (Evolutionary Computing)</strong> <span class='tag tag-field'>子领域</span>", children: [
+            { text: "遗传算法 (Genetic Algorithm)" },
+            { text: "遗传编程 (Genetic Programming)" },
+          ]},
+          { text: "<strong>群体智能 (Swarm Intelligence)</strong> <span class='tag tag-field'>子领域</span>", children: [
+            { text: "粒子群优化 (Particle Swarm Optimization)" },
+            { text: "蚁群优化 (Ant Colony Optimization)" },
+          ]},
+        ]},
+        { text: "模糊集（模糊逻辑、模糊数等）不是本课程重点" },
+      ]
+    },
+    {
+      text: "十二、符号 AI vs 子符号 AI——AI 的\"宗教战争\" <span class='tag tag-concept'>核心概念</span>",
+      children: [
+        { text: "<strong>符号主义 (Symbolic)</strong>", children: [
+          { text: "声明式 (Declarative)、基于规则 (Rules)" },
+          { text: "可人工设计或通过学习获得" },
+          { text: "<em>更容易被人理解和解释</em>（可解释性好）" },
+          { text: "代表：逻辑系统、专家系统、KBS、规划系统、基于语法的 NLP、逻辑编程" },
+        ]},
+        { text: "<strong>子符号主义 (Sub-symbolic)</strong>", children: [
+          { text: "网络化/连接主义 (Networks/connectionist)、基于权重和参数" },
+          { text: "通过学习或进化获得" },
+          { text: "<em>较难被人理解和解释</em>（\"黑箱\"问题）" },
+          { text: "代表：神经网络、进化算法、贝叶斯网络、HMM、LDA、SVM、统计 NLP" },
+        ]},
+        { text: "<strong>中间地带</strong>：模糊逻辑 (Fuzzy Logic)、概率逻辑 (Probabilistic Logic)" },
+        { text: "人类擅长在两种模式间无缝切换——如何让 AI 也做到这一点是巨大挑战 <span class='tag tag-think'>思考题</span>" },
+      ]
+    },
+    {
+      text: "十三、AI 的核心 = 搜索与优化 (Search & Optimisation)",
+      children: [
+        { text: "有人曾说：<strong>AI = 搜索 (search)</strong>" },
+        { text: "讲师更进一步：<strong>AI = 优化 (optimisation)</strong>——搜索最优解才是 AI 的核心 <span class='tag tag-key'>重点</span>", children: [
+          { text: "神经网络训练 = 在参数空间中寻找使损失函数最小化的最优权重" },
+          { text: "遗传算法 = 在解空间中通过进化寻找最优解" },
+          { text: "强化学习 = 在策略空间中寻找使累积奖励最大化的最优策略" },
+        ]},
+        { text: "这就是课程接下来的起点——从理解<em>优化</em>开始 <span class='tag tag-key'>重点</span>" },
+      ]
+    },
+    {
+      text: "十四、核心要点总结",
+      children: [
+        { text: "1. 传统确定性 AI 在精确定义的人工世界中好用，但面对现实世界的不确定性和动态变化时严重不足" },
+        { text: "2. 自然界通过学习、进化、集体涌现行为等多层次机制解决了适应问题" },
+        { text: "3. 从自然中汲取灵感 → 计算智能/自然启发计算/软计算/自适应系统（同一领域的不同名称）" },
+        { text: "4. 本课程三大支柱：<strong>神经网络、进化计算、群体智能</strong> <span class='tag tag-key'>重点</span>" },
+        { text: "5. AI 的核心可以被理解为<strong>优化</strong>——在搜索空间中寻找最优或近似最优的解 <span class='tag tag-key'>重点</span>" },
+      ]
+    },
+  ]
+};
+
+let allNodes = [];
+
+function renderTree(node, level, parentEl) {
+  const div = document.createElement('div');
+  div.className = `node level-${level}` + (node.children ? '' : ' leaf');
+
+  const header = document.createElement('div');
+  header.className = 'node-header';
+
+  const toggle = document.createElement('span');
+  toggle.className = 'node-toggle';
+  toggle.textContent = node.children ? '−' : '•';
+
+  const text = document.createElement('span');
+  text.className = 'node-text';
+  text.innerHTML = node.text;
+
+  header.appendChild(toggle);
+  header.appendChild(text);
+  div.appendChild(header);
+
+  let childContainer = null;
+  if (node.children) {
+    childContainer = document.createElement('div');
+    childContainer.className = 'node-children';
+    node.children.forEach(c => renderTree(c, level + 1, childContainer));
+    div.appendChild(childContainer);
+
+    header.addEventListener('click', () => {
+      const collapsed = childContainer.classList.toggle('collapsed');
+      toggle.textContent = collapsed ? '+' : '−';
+    });
+  }
+
+  allNodes.push({ div, childContainer, toggle, level });
+  parentEl.appendChild(div);
+}
+
+function toggleAll(expand) {
+  allNodes.forEach(n => {
+    if (n.childContainer) {
+      if (expand) {
+        n.childContainer.classList.remove('collapsed');
+        n.toggle.textContent = '−';
+      } else {
+        n.childContainer.classList.add('collapsed');
+        n.toggle.textContent = '+';
+      }
+    }
+  });
+}
+
+function expandLevel(targetLevel) {
+  allNodes.forEach(n => {
+    if (n.childContainer && n.level <= targetLevel) {
+      n.childContainer.classList.remove('collapsed');
+      n.toggle.textContent = '−';
+    }
+  });
+}
+
+const tree = document.getElementById('tree');
+data.children.forEach(c => renderTree(c, 0, tree));
+</script>
+
+</body>
+</html>

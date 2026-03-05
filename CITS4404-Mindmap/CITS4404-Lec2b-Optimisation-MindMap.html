@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CITS4404 - Optimisation and the Hypothesis Space</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: #f0f4f8;
+    color: #1e2a3a;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .header {
+    text-align: center;
+    padding: 40px 20px 20px;
+    position: relative;
+  }
+
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #4a90d9, transparent);
+  }
+
+  .header h1 {
+    font-size: 1.6em;
+    font-weight: 700;
+    background: linear-gradient(135deg, #2270b8, #1a96c8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1px;
+  }
+
+  .header .subtitle {
+    font-size: 0.85em;
+    color: #5a6a80;
+    margin-top: 8px;
+    font-weight: 300;
+  }
+
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 16px 20px 8px;
+    font-size: 0.75em;
+    color: #5a6a80;
+    flex-wrap: wrap;
+  }
+
+  .legend span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .legend .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+  }
+
+  .node {
+    margin: 6px 0;
+    position: relative;
+  }
+
+  .node-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    user-select: none;
+  }
+
+  .node-header:hover {
+    background: rgba(74, 144, 217, 0.09);
+  }
+
+  .node-toggle {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    margin-top: 2px;
+    transition: all 0.2s ease;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+  }
+
+  .node-text {
+    flex: 1;
+    line-height: 1.6;
+    font-size: 0.9em;
+  }
+
+  .node-children {
+    margin-left: 26px;
+    border-left: 1px solid rgba(74, 144, 217, 0.22);
+    padding-left: 10px;
+    overflow: hidden;
+    transition: max-height 0.35s ease, opacity 0.25s ease;
+  }
+
+  .node-children.collapsed {
+    max-height: 0 !important;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .level-0 > .node-header {
+    background: linear-gradient(135deg, rgba(74, 144, 217, 0.12), rgba(126, 200, 227, 0.06));
+    border: 1px solid rgba(74, 144, 217, 0.28);
+    border-radius: 10px;
+    margin-bottom: 4px;
+  }
+
+  .level-0 > .node-header .node-text {
+    font-weight: 700;
+    font-size: 1.05em;
+    color: #111111;
+  }
+
+  .level-0 > .node-header .node-toggle {
+    background: rgba(74, 144, 217, 0.2);
+    color: #1a6fa0;
+  }
+
+  .level-1 > .node-header .node-text {
+    font-weight: 500;
+    color: #222222;
+  }
+
+  .level-1 > .node-header .node-toggle {
+    background: rgba(74, 144, 217, 0.12);
+    color: #3a6aa0;
+  }
+
+  .level-2 > .node-header .node-text {
+    color: #333333;
+    font-weight: 400;
+  }
+
+  .level-2 > .node-header .node-toggle {
+    background: rgba(74, 144, 217, 0.08);
+    color: #5a8ab8;
+  }
+
+  .level-3 > .node-header .node-text {
+    color: #555555;
+    font-weight: 300;
+    font-size: 0.85em;
+  }
+
+  .level-3 > .node-header .node-toggle {
+    background: rgba(74, 144, 217, 0.05);
+    color: #4a7a9b;
+  }
+
+  .leaf > .node-header .node-toggle {
+    background: none;
+    color: #aaaaaa;
+    font-size: 6px;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 4px;
+    font-size: 0.72em;
+    font-weight: 500;
+    margin-left: 6px;
+    vertical-align: middle;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .tag-concept { background: rgba(100, 60, 190, 0.09); color: #5030a0; }
+  .tag-key { background: rgba(180, 90, 0, 0.09); color: #a05010; }
+  .tag-example { background: rgba(0, 140, 90, 0.09); color: #007850; }
+  .tag-think { background: rgba(160, 110, 0, 0.09); color: #806000; }
+  .tag-term { background: rgba(180, 30, 30, 0.09); color: #a02020; }
+  .tag-formula { background: rgba(50, 100, 180, 0.09); color: #2050a0; }
+
+  .controls {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px 0 4px;
+  }
+
+  .ctrl-btn {
+    padding: 6px 16px;
+    border: 1px solid rgba(74, 144, 217, 0.3);
+    background: rgba(74, 144, 217, 0.08);
+    color: #2270b8;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.78em;
+    font-family: 'Noto Sans SC', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .ctrl-btn:hover {
+    background: rgba(74, 144, 217, 0.14);
+    border-color: rgba(74, 144, 217, 0.4);
+  }
+
+  strong { color: #111111; font-weight: 500; }
+  em { font-style: normal; color: #0a7aaa; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Optimisation and the Hypothesis Space — 优化与假设空间</h1>
+  <div class="subtitle">CITS4404 AI and Adaptive Systems — 思维导图 | © Siwen Luo, UWA</div>
+</div>
+
+<div class="legend">
+  <span><span class="dot" style="background:#b89aff"></span>核心概念</span>
+  <span><span class="dot" style="background:#ffaa64"></span>重点</span>
+  <span><span class="dot" style="background:#64dcb4"></span>例子</span>
+  <span><span class="dot" style="background:#ffd64a"></span>思考题</span>
+  <span><span class="dot" style="background:#ff8a8a"></span>术语</span>
+  <span><span class="dot" style="background:#8ab4f0"></span>公式</span>
+</div>
+
+<div class="controls">
+  <button class="ctrl-btn" onclick="toggleAll(true)">全部展开</button>
+  <button class="ctrl-btn" onclick="toggleAll(false)">全部折叠</button>
+  <button class="ctrl-btn" onclick="toggleAll(false); expandLevel(0); expandLevel(1);">展开两级</button>
+</div>
+
+<div class="container" id="tree"></div>
+
+<script>
+const data = {
+  text: "CITS4404 AI and Adaptive Systems — Optimisation and the Hypothesis Space",
+  children: [
+    {
+      text: "一、优化——AI 的引擎 (Optimisation - The Heart of AI)",
+      children: [
+        { text: "优化不等于 AI，但优化是 AI 的<strong>引擎</strong>——\"让 AI 运转起来的东西\" <span class='tag tag-key'>重点</span>" },
+        { text: "字典定义：使某物（设计、系统或决策）尽可能完美、功能完善或有效的行为/过程/方法 <span class='tag tag-term'>术语</span>" },
+        { text: "数学定义：找到函数的最大值或最小值的程序" },
+        { text: "本节目标：剖析优化的关键组成部分，引入课程术语体系" },
+      ]
+    },
+    {
+      text: "二、初步感受优化：从实际问题到抽象 (Thinking about Optimisation)",
+      children: [
+        { text: "<strong>四个阶段</strong> <span class='tag tag-example'>例子</span>", children: [
+          { text: "1. <strong>问题 (Problem)</strong>：Perth 地图上的路线规划——找到最短/最快路径" },
+          { text: "2. <strong>抽象表示 (Abstract Representation)</strong>：将地图转化为加权图（节点=地点，边=距离/时间）" },
+          { text: "3. <strong>简单问题的解</strong>：一维函数曲线，找到最小值点" },
+          { text: "4. <strong>候选解 (Candidate Solutions)</strong>：高维空间中的散点——复杂问题中解的分布" },
+        ]},
+        { text: "<strong>解空间 (Solution Space)</strong>：所有可能的解构成的集合 <span class='tag tag-term'>术语</span>" },
+        { text: "优化的任务 = 在解空间中找到最好的那一个（或一组） <span class='tag tag-concept'>核心概念</span>" },
+      ]
+    },
+    {
+      text: "三、优化的三大关键要素 (Three Key Ingredients) <span class='tag tag-concept'>核心概念</span><span class='tag tag-key'>重点</span>",
+      children: [
+        { text: "三角形框架：三个顶点通过\"优化\"过程连接" },
+        { text: "<strong>要素 1：语言 (Language)</strong> — 表示 (Representation) <span class='tag tag-term'>术语</span>", children: [
+          { text: "定义了<em>解空间</em>——你能考虑哪些可能的解" },
+          { text: "决定了问题的边界：<em>如果你无法描述它，你就无法为它建模！</em>" },
+        ]},
+        { text: "<strong>要素 2：模型 (Model)</strong> — 实例化 (Instantiation) <span class='tag tag-term'>术语</span>", children: [
+          { text: "解空间中的一个具体<em>候选解 (candidate solution)</em>" },
+          { text: "也叫<em>假设 (hypothesis)</em>" },
+        ]},
+        { text: "<strong>要素 3：度量 (Metric)</strong> — 评估 (Evaluation) <span class='tag tag-term'>术语</span>", children: [
+          { text: "回答：\"这个模型有多好？\" (how good is the model?)" },
+          { text: "衡量候选解与目标之间的\"距离\"" },
+        ]},
+        { text: "类比：装修房子——语言=风格目录，模型=具体方案，度量=家人打分 <span class='tag tag-example'>例子</span>" },
+      ]
+    },
+    {
+      text: "四、要素 1 详解：语言/表示 (Language/Representation)",
+      children: [
+        { text: "<strong>金句：如果你无法描述它，你就无法为它建模！</strong> <span class='tag tag-key'>重点</span>" },
+        { text: "\"语言\"是广义的，任何可以用来表达解的方式都算 <span class='tag tag-concept'>核心概念</span>", children: [
+          { text: "数学方程、自然语言、文法 (grammars)、逻辑" },
+          { text: "有限自动机/有限状态机、计算机程序、逻辑程序" },
+          { text: "甘特图 (Gantt charts)、PERT 图、仿真语言" },
+          { text: "甚至\"冰棍棒和胶水\" (popsticks and glue)" },
+        ]},
+        { text: "<strong>生成 vs 解析 (Generation vs Parsing)</strong> <span class='tag tag-concept'>核心概念</span>", children: [
+          { text: "生成 (Generation)：从规则出发产生所有合法结构——即解空间中所有可能的解" },
+          { text: "解析 (Parsing)：给定结构，判断是否合法——即检验候选解是否在解空间中" },
+          { text: "PSG 文法示例：\"the drunken sailor saluted the cat\" ✓ <span class='tag tag-example'>例子</span>" },
+          { text: "文法只管结构合法性，不管语义合理性——\"the bridge saluted the horse\" 语法上也合法" },
+        ]},
+        { text: "<strong>测试 vs 生成 (Test vs Generate)</strong> <span class='tag tag-key'>重点</span>", children: [
+          { text: "不需要生成整个解空间就能判断候选解是否合法" },
+          { text: "测试（解析）= 有限时间；生成整个空间 = 可能需要无限时间" },
+          { text: "<em>通常测试比生成便宜得多</em>（多项式时间 vs 指数/无限时间）" },
+          { text: "与 P vs NP 问题相关：验证解很快，找到最优解可能极难 → 需要启发式算法" },
+        ]},
+        { text: "<strong>语言的表达能力 (Expressiveness)</strong> <span class='tag tag-concept'>核心概念</span>", children: [
+          { text: "A 比 B 更具表达能力 ⇔ A 包含 B 能描述的一切，且 A 还能描述 B 不能描述的东西" },
+          { text: "例 1：多项式函数比线性函数更具表达能力（线性是多项式的特例） <span class='tag tag-example'>例子</span>" },
+          { text: "例 2：上下文无关语言比正则语言更具表达能力（能描述 aⁿbⁿ） <span class='tag tag-example'>例子</span>" },
+          { text: "例 3：一阶逻辑比命题逻辑更丰富（∀x man(x) ⟹ mortal(x)） <span class='tag tag-example'>例子</span>" },
+          { text: "权衡：表达能力越强 → 解空间越大 → 搜索越困难 <span class='tag tag-key'>重点</span>" },
+        ]},
+        { text: "<strong>乔姆斯基层次 (Chomsky Hierarchy)</strong> <span class='tag tag-concept'>核心概念</span>", children: [
+          { text: "Type 3（正则）⊂ Type 2（上下文无关）⊂ Type 1（上下文相关）⊂ Type 0（递归可枚举）" },
+          { text: "从 Type 3 到 Type 0：表达能力递增，计算复杂性也递增" },
+          { text: "对应的自动机：有限状态自动机 → 下推自动机 → 线性有界图灵机 → 图灵机" },
+        ]},
+      ]
+    },
+    {
+      text: "五、要素 2 详解：模型/实例化 (Model/Instantiation)",
+      children: [
+        { text: "<strong>模型是什么？</strong>", children: [
+          { text: "用选定语言描述出的一个<em>具体实例</em>" },
+          { text: "所有可能描述中的一个特定选择" },
+          { text: "可以是可执行的 (executable)、参数化的 (parameterised)、生成性的 (generative) 或标准形式的 (canonical form)" },
+        ]},
+        { text: "<strong>模型 = 假设 (Model = Hypothesis)</strong> <span class='tag tag-concept'>核心概念</span><span class='tag tag-key'>重点</span>", children: [
+          { text: "模型是对现实世界的<em>近似 (approximation)</em>" },
+          { text: "模型是对现实世界的<em>抽象 (abstraction)</em>" },
+          { text: "模型是试图描述现实世界如何运作的<em>假设 (hypothesis)</em>" },
+          { text: "在优化语境中，模型就是一个<em>候选解 (candidate solution)</em>" },
+        ]},
+        { text: "<strong>\"现实世界中的一切都是函数！？\"</strong> <span class='tag tag-think'>思考题</span>", children: [
+          { text: "温度随时间变化、股价波动、像素排列……都可看作输入到输出的映射" },
+          { text: "所以：模型/假设 = 在选定语言中，试图描述/解释某个<em>函数</em>的尝试" },
+          { text: "注：\"现实\"不一定指\"物理的\"——虚拟世界中的现象同样可以被建模" },
+        ]},
+        { text: "COVID 数据拟合示例：同一组数据可用线性、二次、指数等不同模型拟合——它们都是候选解 <span class='tag tag-example'>例子</span>" },
+      ]
+    },
+    {
+      text: "六、假设空间 (Hypothesis Space / Solution Space) <span class='tag tag-concept'>核心概念</span>",
+      children: [
+        { text: "<strong>定义</strong>：由语言定义的所有可能假设（候选解）构成的集合 <span class='tag tag-term'>术语</span>" },
+        { text: "语言是\"生成性的\"——它定义了\"所有你能描述的东西\"" },
+        { text: "真实世界的目标可能在假设空间<strong>内部</strong>（可完美建模），也可能在<strong>外部</strong>（只能近似） <span class='tag tag-key'>重点</span>" },
+        { text: "优化 = 在假设空间中搜索离真实世界目标最\"近\"的假设" },
+      ]
+    },
+    {
+      text: "七、要素 3 详解：度量/评估 (Metric/Evaluation)",
+      children: [
+        { text: "<strong>核心问题</strong>：你的假设有多\"好\"？ (How good is your hypothesis?)" },
+        { text: "衡量假设与真实目标之间的<em>误差/距离 (error/distance)</em>" },
+        { text: "<strong>度量的性质</strong>", children: [
+          { text: "通常只需要<em>相对接近程度</em>即可——\"A 比 B 好\"就够了，不需要绝对值有实际意义 <span class='tag tag-key'>重点</span>" },
+          { text: "有时目标本身不明确（如\"无限适应度\"），只需寻找尽可能好的假设" },
+        ]},
+        { text: "<strong>度量函数的多个名称</strong>（本质相同，方向可能不同）<span class='tag tag-term'>术语</span>", children: [
+          { text: "误差函数 (error function)——最小化" },
+          { text: "代价函数 (cost function)——最小化" },
+          { text: "适应度函数 (fitness function)——最大化" },
+          { text: "目标函数 (objective function)——最小化或最大化" },
+          { text: "惩罚函数 (penalty function)——最小化" },
+          { text: "效用函数 (utility function)——最大化" },
+        ]},
+        { text: "数学表达：<strong>f : H → ℝ</strong>（从假设空间到实数的映射） <span class='tag tag-formula'>公式</span>" },
+        { text: "有时存在<em>多个目标</em> (multiple objectives)——引出多目标优化问题" },
+      ]
+    },
+    {
+      text: "八、特征 (Features)——比较什么？",
+      children: [
+        { text: "语言的选择不仅决定了可用假设，还决定了可用于比较的<strong>特征</strong> <span class='tag tag-concept'>核心概念</span>" },
+        { text: "\"典型澳大利亚人\" Claire 的例子：年龄 38、女性、已婚、两个孩子、三居室…… <span class='tag tag-example'>例子</span>", children: [
+          { text: "如何确定一个人和 Claire 之间的\"距离\"？ <span class='tag tag-think'>思考题</span>" },
+          { text: "数值型特征（年龄）可直接算差值，分类特征（性别、语言）如何量化？" },
+          { text: "人口普查是一个好的\"人的模型\"吗？显然遗漏了性格、兴趣、价值观等 <span class='tag tag-think'>思考题</span>" },
+        ]},
+        { text: "选择不同特征来评估，可能得出完全不同的结论" },
+      ]
+    },
+    {
+      text: "九、数值特征与误差计算 (Numerical Features and Error)",
+      children: [
+        { text: "在数值领域中度量更容易：特征是数字，误差是模型预测值与真实值的差距" },
+        { text: "<strong>均方误差 (MSE)</strong> <span class='tag tag-formula'>公式</span><span class='tag tag-key'>重点</span>", children: [
+          { text: "MSE = (1/N) × Σ (f(xᵢ) - yᵢ)²" },
+          { text: "N = 数据点数量，f(xᵢ) = 模型预测值，yᵢ = 真实值" },
+          { text: "平方的作用：消除正负误差的抵消效应，放大大误差的权重" },
+          { text: "MSE 是机器学习中最基础、最常用的损失函数之一" },
+        ]},
+        { text: "两个拟合直线的对比：model 2（MSE=1.14）比 model 1（MSE=1.38）更好 <span class='tag tag-example'>例子</span>" },
+        { text: "<strong>警告：简单数值距离不一定反映感知相似度！</strong> <span class='tag tag-key'>重点</span>", children: [
+          { text: "Zhang et al, CVPR 2018：人类判断与传统像素距离度量不一致" },
+          { text: "L2/PSNR/SSIM 等传统度量 vs 深度特征度量——后者更接近人类感知" },
+          { text: "启示：度量选择至关重要，错误的度量导致优化走向错误方向" },
+          { text: "Goodhart 定律：当度量变成目标时，它就不再是好的度量 <span class='tag tag-think'>思考题</span>" },
+        ]},
+      ]
+    },
+    {
+      text: "十、优化的三层定义——从理想到实用",
+      children: [
+        { text: "<strong>理想定义 1</strong>：找到与目标<em>不可区分</em>（零误差）的模型 <span class='tag tag-term'>术语</span>", children: [
+          { text: "如果评估特征是描述的子集 → 可能存在多个等价解" },
+          { text: "在复杂问题中，假设空间中<em>很可能不存在完美匹配的解</em>" },
+        ]},
+        { text: "<strong>理想定义 2</strong>：找到离目标<em>最近</em>（误差最小）的模型 <span class='tag tag-term'>术语</span>", children: [
+          { text: "比定义 1 更现实——不要求零误差，只要求误差最小" },
+          { text: "但在复杂问题中找最优解可能太贵或不可能（无限域）" },
+          { text: "有时目标本身定义不清（\"无限适应度\"）" },
+        ]},
+        { text: "<strong>实用定义（本课程使用）</strong> <span class='tag tag-key'>重点</span><span class='tag tag-concept'>核心概念</span>", children: [
+          { text: "找到一个模型" },
+          { text: "在假设空间（由语言决定）中" },
+          { text: "尽可能接近目标（<em>足够好</em>，good enough）" },
+          { text: "<strong>在给定的计算资源（时间和空间）范围内</strong>" },
+        ]},
+        { text: "引入了关键的<strong>权衡 (trade-off)</strong>：解的质量 vs 计算成本 <span class='tag tag-key'>重点</span>" },
+        { text: "<strong>在线 vs 离线</strong> <span class='tag tag-term'>术语</span>", children: [
+          { text: "<em>在线 (online)</em>：需要实时计算，时间预算紧（如自动驾驶决策）" },
+          { text: "<em>离线 (offline)</em>：可以花更多时间获得更好结果（如训练神经网络模型）" },
+          { text: "两种场景对应不同的权衡点" },
+        ]},
+      ]
+    },
+    {
+      text: "十一、核心要点总结",
+      children: [
+        { text: "1. 优化是 AI 的引擎——驱动各种 AI 方法运转的底层机制" },
+        { text: "2. 任何优化问题 = <strong>语言</strong>（定义解空间）+ <strong>模型</strong>（候选解/假设）+ <strong>度量</strong>（评估好坏） <span class='tag tag-key'>重点</span>" },
+        { text: "3. 语言的<strong>表达能力</strong>决定解空间的大小，但更强表达能力 = 更大搜索难度（核心权衡）" },
+        { text: "4. <strong>假设空间</strong>是所有候选解的集合；目标可能在内（完美建模）或在外（只能近似）" },
+        { text: "5. 度量选择至关重要——错误度量导致优化走向错误方向" },
+        { text: "6. 实践中不求完美解，而是在<strong>计算预算内</strong>找到\"足够好\"的解——质量与效率的权衡 <span class='tag tag-key'>重点</span>" },
+      ]
+    },
+  ]
+};
+
+let allNodes = [];
+
+function renderTree(node, level, parentEl) {
+  const div = document.createElement('div');
+  div.className = `node level-${level}` + (node.children ? '' : ' leaf');
+
+  const header = document.createElement('div');
+  header.className = 'node-header';
+
+  const toggle = document.createElement('span');
+  toggle.className = 'node-toggle';
+  toggle.textContent = node.children ? '−' : '•';
+
+  const text = document.createElement('span');
+  text.className = 'node-text';
+  text.innerHTML = node.text;
+
+  header.appendChild(toggle);
+  header.appendChild(text);
+  div.appendChild(header);
+
+  let childContainer = null;
+  if (node.children) {
+    childContainer = document.createElement('div');
+    childContainer.className = 'node-children';
+    node.children.forEach(c => renderTree(c, level + 1, childContainer));
+    div.appendChild(childContainer);
+
+    header.addEventListener('click', () => {
+      const collapsed = childContainer.classList.toggle('collapsed');
+      toggle.textContent = collapsed ? '+' : '−';
+    });
+  }
+
+  allNodes.push({ div, childContainer, toggle, level });
+  parentEl.appendChild(div);
+}
+
+function toggleAll(expand) {
+  allNodes.forEach(n => {
+    if (n.childContainer) {
+      if (expand) {
+        n.childContainer.classList.remove('collapsed');
+        n.toggle.textContent = '−';
+      } else {
+        n.childContainer.classList.add('collapsed');
+        n.toggle.textContent = '+';
+      }
+    }
+  });
+}
+
+function expandLevel(targetLevel) {
+  allNodes.forEach(n => {
+    if (n.childContainer && n.level <= targetLevel) {
+      n.childContainer.classList.remove('collapsed');
+      n.toggle.textContent = '−';
+    }
+  });
+}
+
+const tree = document.getElementById('tree');
+data.children.forEach(c => renderTree(c, 0, tree));
+</script>
+
+</body>
+</html>
