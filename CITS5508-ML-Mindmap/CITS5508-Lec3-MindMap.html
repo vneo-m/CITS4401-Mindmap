@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CITS5508 - Lecture 3</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: #f0f4f8;
+    color: #1e2a3a;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .header {
+    text-align: center;
+    padding: 40px 20px 20px;
+    position: relative;
+  }
+
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #4a90d9, transparent);
+  }
+
+  .header h1 {
+    font-size: 1.6em;
+    font-weight: 700;
+    background: linear-gradient(135deg, #2270b8, #1a96c8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1px;
+  }
+
+  .header .subtitle {
+    font-size: 0.85em;
+    color: #5a6a80;
+    margin-top: 8px;
+    font-weight: 300;
+  }
+
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 16px 20px 8px;
+    font-size: 0.75em;
+    color: #5a6a80;
+    flex-wrap: wrap;
+  }
+
+  .legend span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .legend .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+  }
+
+  .node {
+    margin: 6px 0;
+    position: relative;
+  }
+
+  .node-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    user-select: none;
+  }
+
+  .node-header:hover {
+    background: rgba(74, 144, 217, 0.09);
+  }
+
+  .node-toggle {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    margin-top: 2px;
+    transition: all 0.2s ease;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+  }
+
+  .node-text {
+    flex: 1;
+    line-height: 1.6;
+    font-size: 0.9em;
+  }
+
+  .node-children {
+    margin-left: 26px;
+    border-left: 1px solid rgba(74, 144, 217, 0.22);
+    padding-left: 10px;
+    overflow: hidden;
+    transition: max-height 0.35s ease, opacity 0.25s ease;
+  }
+
+  .node-children.collapsed {
+    max-height: 0 !important;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .level-0 > .node-header {
+    background: linear-gradient(135deg, rgba(74, 144, 217, 0.12), rgba(126, 200, 227, 0.06));
+    border: 1px solid rgba(74, 144, 217, 0.28);
+    border-radius: 10px;
+    margin-bottom: 4px;
+  }
+
+  .level-0 > .node-header .node-text {
+    font-weight: 700;
+    font-size: 1.05em;
+    color: #111111;
+  }
+
+  .level-0 > .node-header .node-toggle {
+    background: rgba(74, 144, 217, 0.2);
+    color: #1a6fa0;
+  }
+
+  .level-1 > .node-header .node-text {
+    font-weight: 500;
+    color: #222222;
+  }
+
+  .level-1 > .node-header .node-toggle {
+    background: rgba(74, 144, 217, 0.12);
+    color: #3a6aa0;
+  }
+
+  .level-2 > .node-header .node-text {
+    color: #333333;
+    font-weight: 400;
+  }
+
+  .level-2 > .node-header .node-toggle {
+    background: rgba(74, 144, 217, 0.08);
+    color: #5a8ab8;
+  }
+
+  .level-3 > .node-header .node-text {
+    color: #555555;
+    font-weight: 300;
+    font-size: 0.85em;
+  }
+
+  .level-3 > .node-header .node-toggle {
+    background: rgba(74, 144, 217, 0.05);
+    color: #4a7a9b;
+  }
+
+  .leaf > .node-header .node-toggle {
+    background: none;
+    color: #aaaaaa;
+    font-size: 6px;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 4px;
+    font-size: 0.72em;
+    font-weight: 500;
+    margin-left: 6px;
+    vertical-align: middle;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .tag-def { background: rgba(100, 60, 190, 0.09); color: #5030a0; }
+  .tag-exam { background: rgba(180, 90, 0, 0.09); color: #a05010; }
+  .tag-data { background: rgba(0, 140, 90, 0.09); color: #007850; }
+  .tag-tip { background: rgba(160, 110, 0, 0.09); color: #806000; }
+  .tag-case { background: rgba(180, 30, 30, 0.09); color: #a02020; }
+  .tag-math { background: rgba(0, 90, 160, 0.09); color: #005090; }
+  .tag-code { background: rgba(50, 50, 50, 0.08); color: #444444; }
+
+  .controls {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px 0 4px;
+  }
+
+  .ctrl-btn {
+    padding: 6px 16px;
+    border: 1px solid rgba(74, 144, 217, 0.3);
+    background: rgba(74, 144, 217, 0.08);
+    color: #2270b8;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.78em;
+    font-family: 'Noto Sans SC', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .ctrl-btn:hover {
+    background: rgba(74, 144, 217, 0.14);
+    border-color: rgba(74, 144, 217, 0.4);
+  }
+
+  strong { color: #111111; font-weight: 500; }
+  em { font-style: normal; color: #0a7aaa; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 0.88em; background: rgba(0,0,0,0.04); padding: 1px 5px; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>CITS5508: Machine Learning — Lecture 3</h1>
+  <div class="subtitle">回归模型 (Regression Models) — 思维导图</div>
+</div>
+
+<div class="legend">
+  <span><span class="dot" style="background:#b89aff"></span>定义</span>
+  <span><span class="dot" style="background:#ffaa64"></span>考试重点</span>
+  <span><span class="dot" style="background:#64dcb4"></span>数据</span>
+  <span><span class="dot" style="background:#ffd64a"></span>实用建议</span>
+  <span><span class="dot" style="background:#ff8a8a"></span>案例</span>
+  <span><span class="dot" style="background:#4a90d9"></span>数学/公式</span>
+  <span><span class="dot" style="background:#888888"></span>代码</span>
+</div>
+
+<div class="controls">
+  <button class="ctrl-btn" onclick="toggleAll(true)">全部展开</button>
+  <button class="ctrl-btn" onclick="toggleAll(false)">全部折叠</button>
+  <button class="ctrl-btn" onclick="toggleAll(false); expandLevel(0); expandLevel(1);">展开两级</button>
+</div>
+
+<div class="container" id="tree"></div>
+
+<script>
+const data = {
+  text: "CITS5508 Machine Learning — Lecture 3：回归模型 (Regression Models)",
+  children: [
+    {
+      text: "一、线性回归 (Linear Regression) <span class='tag tag-exam'>考试重点</span>",
+      children: [
+        {
+          text: "1. 模型定义 <span class='tag tag-def'>定义</span>",
+          children: [
+            { text: "线性模型通过计算输入特征的<strong>加权和</strong>加上一个<strong>偏置项</strong>（截距项）来做预测" },
+            { text: "标量形式：<em>ŷ = θ₀ + θ₁x₁ + θ₂x₂ + ... + θₙxₙ</em> <span class='tag tag-math'>数学</span>" },
+            { text: "其中 ŷ 是预测值，n 是特征数量，xᵢ 是第 i 个特征值，θⱼ 是第 j 个模型参数" },
+            { text: "向量形式：<em>ŷ = h_θ(x) = θᵀx</em> <span class='tag tag-math'>数学</span>", children: [
+              { text: "θ 是模型参数向量：θ = (θ₀, θ₁, …, θₙ)ᵀ，包含偏置项 θ₀ 和各特征权重" },
+              { text: "x 是实例特征向量：x = (1, x₁, …, xₙ)ᵀ，注意第一个元素为 1（用于偏置项）" },
+              { text: "θᵀx 是 θ 转置与 x 的矩阵乘法" },
+              { text: "h_θ 是假设函数 (hypothesis function)，使用参数 θ" },
+            ]},
+          ]
+        },
+        {
+          text: "2. 训练模型 — 最小化代价函数 <span class='tag tag-exam'>考试重点</span>",
+          children: [
+            { text: "训练模型 = 设定参数使模型<strong>最佳拟合</strong>训练集 <span class='tag tag-def'>定义</span>" },
+            { text: "需要找到使代价函数 C(θ) 最小的 θ：<em>θ̂ = arg min_θ C(θ)</em> <span class='tag tag-math'>数学</span>" },
+            { text: "<strong>均方误差 MSE</strong>：MSE(X, h_θ) = (1/m) Σᵢ (θᵀx⁽ⁱ⁾ − y⁽ⁱ⁾)² <span class='tag tag-math'>数学</span>", children: [
+              { text: "m 是训练样本数量" },
+              { text: "对大误差惩罚更重（平方放大了误差）" },
+            ]},
+            { text: "<strong>残差平方和 RSS</strong>：RSS(X, h_θ) = Σᵢ (θᵀx⁽ⁱ⁾ − y⁽ⁱ⁾)² <span class='tag tag-math'>数学</span>", children: [
+              { text: "RSS = m × MSE，两者最小化结果等价" },
+            ]},
+          ]
+        },
+        {
+          text: "3. 正规方程 (Normal Equation) — 闭式解 <span class='tag tag-exam'>考试重点</span>",
+          children: [
+            { text: "RSS 的矩阵形式：RSS = ‖y − Xθ‖² = (y − Xθ)ᵀ(y − Xθ) <span class='tag tag-math'>数学</span>" },
+            { text: "对 θ 求导：∂RSS/∂θ = −2Xᵀ(y − Xθ) <span class='tag tag-math'>数学</span>" },
+            { text: "令导数为零：Xᵀ(y − Xθ) = 0 <span class='tag tag-math'>数学</span>" },
+            { text: "<strong>正规方程</strong>：<em>θ̂ = (XᵀX)⁻¹ Xᵀy</em> <span class='tag tag-math'>数学</span><span class='tag tag-exam'>考试重点</span>", children: [
+              { text: "X 是 m × (n+1) 矩阵，第 i 行是训练实例 x⁽ⁱ⁾" },
+              { text: "θ̂ 是使代价函数最小化的参数值" },
+              { text: "y 是目标值向量，包含 y⁽¹⁾ 到 y⁽ᵐ⁾" },
+            ]},
+            { text: "预测：已知 θ̂ 后，对新测试实例 x_test 预测 <em>y_test = θ̂ᵀ x_test</em>" },
+            { text: "计算复杂度：对特征数 n 是<strong>立方</strong>级（矩阵求逆），对样本数 m 是线性级 <span class='tag tag-tip'>建议</span>" },
+          ]
+        },
+        {
+          text: "4. 代码示例 <span class='tag tag-code'>代码</span>",
+          children: [
+            { text: "生成随机数据：<code>X = 2 * np.random.rand(100, 1)</code>，<code>y = 4 + 3 * X + np.random.randn(100, 1)</code> <span class='tag tag-case'>案例</span>" },
+            { text: "手动实现正规方程 <span class='tag tag-code'>代码</span>：", children: [
+              { text: "<code>X_b = np.c_[np.ones((100, 1)), X]</code> — 给每个实例添加 x₀ = 1" },
+              { text: "<code>theta_best = np.linalg.inv(X_b.T @ X_b) @ X_b.T @ y</code>" },
+              { text: "结果 θ₀ ≈ 4.215, θ₁ ≈ 2.770（接近真实值 4 和 3）<span class='tag tag-data'>数据</span>" },
+            ]},
+            { text: "Scikit-Learn 实现 <span class='tag tag-code'>代码</span>：", children: [
+              { text: "<code>from sklearn.linear_model import LinearRegression</code>" },
+              { text: "<code>lin_reg = LinearRegression(); lin_reg.fit(X, y)</code>" },
+              { text: "<code>lin_reg.intercept_</code> 和 <code>lin_reg.coef_</code> 获取参数" },
+              { text: "Scikit-Learn 内部使用 <strong>SVD（奇异值分解）</strong>求解，数值更稳定 <span class='tag tag-tip'>建议</span>" },
+            ]},
+          ]
+        },
+      ]
+    },
+    {
+      text: "二、梯度下降 (Gradient Descent) <span class='tag tag-exam'>考试重点</span>",
+      children: [
+        {
+          text: "1. 基本思想 <span class='tag tag-def'>定义</span>",
+          children: [
+            { text: "一种非常通用的<strong>优化算法</strong>，通过迭代调整参数来最小化代价函数" },
+            { text: "核心思路：测量误差函数关于参数向量 θ 的<strong>局部梯度</strong>，沿梯度下降方向前进" },
+            { text: "初始化：用<strong>随机值</strong>填充 θ（随机初始化）" },
+            { text: "迭代改进：每一步尝试减小代价函数（如 MSE），直到算法<strong>收敛到最小值</strong>" },
+            { text: "当梯度为零时，达到一个（局部）极小值" },
+          ]
+        },
+        {
+          text: "2. 偏导数与梯度向量 <span class='tag tag-math'>数学</span>",
+          children: [
+            { text: "偏导数：计算代价函数关于每个参数 θⱼ 的变化率 <span class='tag tag-def'>定义</span>" },
+            { text: "MSE 关于 θⱼ 的偏导：<em>∂MSE(θ)/∂θⱼ = (2/m) Σᵢ (θᵀx⁽ⁱ⁾ − y⁽ⁱ⁾) xⱼ⁽ⁱ⁾</em> <span class='tag tag-math'>数学</span>" },
+            { text: "梯度向量包含所有偏导数：<em>∇_θ MSE(θ) = (2/m) Xᵀ(Xθ − y)</em> <span class='tag tag-math'>数学</span><span class='tag tag-exam'>考试重点</span>" },
+            { text: "直觉理解 <span class='tag tag-tip'>建议</span>：", children: [
+              { text: "当 ∂f/∂z < 0 时（在当前点函数值在下降），z 需要增大以接近最小值" },
+              { text: "当 ∂f/∂z > 0 时（在当前点函数值在上升），z 需要减小以接近最小值" },
+              { text: "因此更新方向为梯度的<strong>负方向</strong>" },
+            ]},
+          ]
+        },
+        {
+          text: "3. 梯度下降更新步骤 <span class='tag tag-exam'>考试重点</span>",
+          children: [
+            { text: "<strong>更新公式</strong>：<em>θ⁽ᵗ⁺¹⁾ = θ⁽ᵗ⁾ − η ∇_θ MSE(θ⁽ᵗ⁾)</em> <span class='tag tag-math'>数学</span>" },
+            { text: "θ⁽ᵗ⁾ 是上一步的参数值，θ⁽ᵗ⁺¹⁾ 是新的参数值" },
+            { text: "η (eta) 是<strong>学习率</strong>（步长），是一个超参数 <span class='tag tag-def'>定义</span>" },
+          ]
+        },
+        {
+          text: "4. 学习率的影响 <span class='tag tag-exam'>考试重点</span>",
+          children: [
+            { text: "学习率<strong>太小</strong>（如 η=0.02）：收敛非常慢，需要很多迭代 <span class='tag tag-tip'>建议</span>" },
+            { text: "学习率<strong>适中</strong>（如 η=0.1）：正常收敛到最小值" },
+            { text: "学习率<strong>太大</strong>（如 η=0.5）：算法<strong>发散</strong>，来回跳跃，越跑越远 <span class='tag tag-tip'>建议</span>" },
+          ]
+        },
+        {
+          text: "5. 梯度下降的陷阱 <span class='tag tag-exam'>考试重点</span>",
+          children: [
+            { text: "<strong>局部最小值 (Local Minimum)</strong>：梯度下降可能停在局部最小值而非全局最小值 <span class='tag tag-def'>定义</span>" },
+            { text: "<strong>平台 (Plateau)</strong>：梯度接近零的平坦区域，导致收敛极慢 <span class='tag tag-def'>定义</span>" },
+            { text: "好消息：MSE 代价函数是<strong>凸函数</strong>（碗形），只有一个全局最小值 <span class='tag tag-tip'>建议</span>" },
+            { text: "但如果特征尺度不同，碗可能被拉伸为<strong>椭球</strong>，收敛会更慢", children: [
+              { text: "因此使用梯度下降前应<strong>标准化特征</strong>（Feature Scaling）<span class='tag tag-tip'>建议</span>" },
+            ]},
+          ]
+        },
+        {
+          text: "6. 批量梯度下降 (Batch GD) 实现 <span class='tag tag-code'>代码</span>",
+          children: [
+            { text: "<code>eta = 0.1</code>，<code>n_epochs = 1000</code>" },
+            { text: "每次迭代使用<strong>全部训练集</strong>计算梯度：<code>gradients = 2/m * X_b.T @ (X_b @ theta - y)</code>" },
+            { text: "更新参数：<code>theta = theta - eta * gradients</code>" },
+            { text: "结果与正规方程一致：θ₀ ≈ 4.215, θ₁ ≈ 2.770 <span class='tag tag-data'>数据</span>" },
+          ]
+        },
+        {
+          text: "7. 三种梯度下降变体 <span class='tag tag-exam'>考试重点</span>",
+          children: [
+            { text: "<strong>批量梯度下降 (Batch GD)</strong> <span class='tag tag-def'>定义</span>：", children: [
+              { text: "每一步使用<em>完整训练集</em>计算梯度" },
+              { text: "训练集大时非常慢" },
+              { text: "路径平滑，直接走向最小值" },
+            ]},
+            { text: "<strong>随机梯度下降 (Stochastic GD / SGD)</strong> <span class='tag tag-def'>定义</span>：", children: [
+              { text: "每一步随机选<em>一个实例</em>计算梯度" },
+              { text: "速度快，可处理大规模数据集" },
+              { text: "路径跳跃不规则，但平均方向趋向最小值" },
+              { text: "可能跳出局部最小值（优点），但最终不会精确收敛（缺点）" },
+              { text: "解决方案：<strong>逐渐降低学习率</strong>（学习率调度），让算法最终稳定 <span class='tag tag-tip'>建议</span>" },
+            ]},
+            { text: "<strong>小批量梯度下降 (Mini-batch GD)</strong> <span class='tag tag-def'>定义</span>：", children: [
+              { text: "每一步使用<em>小批量随机样本</em>（mini-batch）计算梯度" },
+              { text: "利用硬件矩阵运算优化（如向量化、GPU 加速）获得性能提升" },
+              { text: "路径比 SGD 更平滑，但比 Batch GD 更有噪声" },
+            ]},
+          ]
+        },
+        {
+          text: "8. SGD 学习率调度示例 <span class='tag tag-code'>代码</span>",
+          children: [
+            { text: "使用学习率调度函数：<code>learning_schedule(t) = t0 / (t + t1)</code>" },
+            { text: "t0、t1 是超参数（示例中 t0=5, t1=50）" },
+            { text: "随着迭代次数增加，学习率逐步减小" },
+            { text: "每个 epoch 内遍历 m 个样本，每次随机选一个进行更新" },
+          ]
+        },
+        {
+          text: "9. 方法对比总结 <span class='tag tag-exam'>考试重点</span>",
+          children: [
+            { text: "<strong>正规方程</strong>：大 m 快，大 n 慢，无超参数，无需缩放 <span class='tag tag-data'>数据</span>" },
+            { text: "<strong>SVD</strong>：大 m 快，大 n 慢，无超参数，无需缩放；Scikit-Learn 的 LinearRegression 使用此方法" },
+            { text: "<strong>Batch GD</strong>：大 m 慢，大 n 快，2 个超参数（η, 迭代数），需要缩放" },
+            { text: "<strong>SGD</strong>：大 m 快，大 n 快，≥2 个超参数，需要缩放；Scikit-Learn: SGDRegressor" },
+            { text: "<strong>Mini-batch GD</strong>：大 m 快，大 n 快，≥2 个超参数，需要缩放" },
+            { text: "超参数包括：学习率 η、迭代次数、批量大小、动量等" },
+          ]
+        },
+      ]
+    },
+    {
+      text: "三、多项式回归 (Polynomial Regression) <span class='tag tag-exam'>考试重点</span>",
+      children: [
+        {
+          text: "1. 动机：非线性数据 <span class='tag tag-case'>案例</span>",
+          children: [
+            { text: "当数据比直线更复杂时，线性回归效果不好" },
+            { text: "示例数据：<em>y = 0.5x₁² + x₁ + 2 + ε</em>，其中 ε ~ N(0,1) <span class='tag tag-data'>数据</span>" },
+            { text: "数据呈抛物线形状，无法用直线拟合" },
+          ]
+        },
+        {
+          text: "2. 核心思想 <span class='tag tag-def'>定义</span>",
+          children: [
+            { text: "引入新特征：将原始特征的<strong>高次幂</strong>作为新特征加入模型" },
+            { text: "例如 degree=2：将 x₁ 扩展为 [x₁, x₁²]，然后用<strong>线性回归</strong>来拟合" },
+            { text: "模型本身对参数仍然是线性的，但对原始特征是非线性的 <span class='tag tag-tip'>建议</span>" },
+          ]
+        },
+        {
+          text: "3. Scikit-Learn 实现 <span class='tag tag-code'>代码</span>",
+          children: [
+            { text: "<code>from sklearn.preprocessing import PolynomialFeatures</code>" },
+            { text: "<code>poly_features = PolynomialFeatures(degree=2, include_bias=False)</code>" },
+            { text: "<code>X_poly = poly_features.fit_transform(X)</code> — 将 [x₁] 转换为 [x₁, x₁²]" },
+            { text: "然后用 LinearRegression 拟合 X_poly" },
+            { text: "拟合结果：<em>ŷ = 0.56x₁² + 0.93x₁ + 1.78</em>（接近真实 0.5, 1.0, 2.0）<span class='tag tag-data'>数据</span>" },
+          ]
+        },
+        {
+          text: "4. 过拟合问题 <span class='tag tag-exam'>考试重点</span>",
+          children: [
+            { text: "不同多项式阶数的效果对比 <span class='tag tag-case'>案例</span>：", children: [
+              { text: "<strong>1 阶</strong>（直线）：<em>欠拟合 (Underfitting)</em> — 模型太简单，无法捕捉数据的真实模式" },
+              { text: "<strong>2 阶</strong>（二次）：<em>拟合适当</em> — 与数据生成方式匹配，泛化能力最好" },
+              { text: "<strong>300 阶</strong>：<em>过拟合 (Overfitting)</em> — 模型过于复杂，在训练集上拟合完美，但泛化极差" },
+            ]},
+            { text: "关键问题：在不知道数据生成函数的情况下，如何确定模型复杂度？" },
+            { text: "答案：使用<strong>学习曲线</strong>来诊断 <span class='tag tag-tip'>建议</span>" },
+          ]
+        },
+      ]
+    },
+    {
+      text: "四、学习曲线 (Learning Curves) <span class='tag tag-exam'>考试重点</span>",
+      children: [
+        {
+          text: "1. 定义与用途 <span class='tag tag-def'>定义</span>",
+          children: [
+            { text: "学习曲线是模型在<strong>训练集</strong>和<strong>验证集</strong>上的性能（如 RMSE）随训练集大小变化的图" },
+            { text: "方法：用不同大小的训练集子集多次训练模型，记录每次的训练误差和验证误差" },
+            { text: "用途：判断模型是<em>过拟合</em>还是<em>欠拟合</em> <span class='tag tag-tip'>建议</span>" },
+          ]
+        },
+        {
+          text: "2. 欠拟合的学习曲线特征 <span class='tag tag-exam'>考试重点</span>",
+          children: [
+            { text: "训练误差：初始很低，随训练集增大逐渐上升，最终<strong>较高</strong>并趋于平稳" },
+            { text: "验证误差：初始很高，随训练集增大逐渐下降，最终<strong>较高</strong>并趋于平稳" },
+            { text: "两条曲线<strong>接近</strong>且都处于较高水平 <span class='tag tag-tip'>建议</span>" },
+            { text: "特点：增加更多训练数据<strong>不会显著改善</strong>模型 <span class='tag tag-tip'>建议</span>" },
+          ]
+        },
+        {
+          text: "3. 过拟合的学习曲线特征 <span class='tag tag-exam'>考试重点</span>",
+          children: [
+            { text: "训练误差：<strong>很低</strong>（模型在训练数据上拟合得非常好）" },
+            { text: "验证误差：<strong>明显高于</strong>训练误差" },
+            { text: "两条曲线之间有<strong>较大间距 (gap)</strong> <span class='tag tag-tip'>建议</span>" },
+            { text: "特点：增加更多训练数据<strong>有助于改善</strong>（间距会缩小）<span class='tag tag-tip'>建议</span>" },
+          ]
+        },
+      ]
+    },
+    {
+      text: "五、正则化线性模型 (Regularised Linear Models)",
+      children: [
+        {
+          text: "（讲义中列为本讲内容之一，具体展开见教材第4章）",
+          children: [
+            { text: "正则化通过约束模型参数来<strong>减少过拟合</strong> <span class='tag tag-def'>定义</span>" },
+            { text: "常见方法：Ridge（L2 正则化）、Lasso（L1 正则化）、Elastic Net" },
+            { text: "在代价函数中增加惩罚项，限制参数的大小 <span class='tag tag-math'>数学</span>" },
+          ]
+        },
+      ]
+    },
+    {
+      text: "六、逻辑回归 (Logistic Regression) <span class='tag tag-exam'>考试重点</span>",
+      children: [
+        {
+          text: "1. 概述 <span class='tag tag-def'>定义</span>",
+          children: [
+            { text: "也称为 Logit Regression" },
+            { text: "虽然名字含「回归」，但常用于<strong>分类</strong>任务" },
+            { text: "估计某个实例属于特定类别的<strong>概率</strong>（例如「这封邮件是垃圾邮件的概率是多少？」）" },
+          ]
+        },
+        {
+          text: "2. 模型原理 <span class='tag tag-exam'>考试重点</span>",
+          children: [
+            { text: "与线性回归类似，先计算输入特征的加权和（加偏置项）" },
+            { text: "然后将结果通过 <strong>Logistic 函数（Sigmoid 函数）</strong>映射到 [0, 1] <span class='tag tag-def'>定义</span>" },
+            { text: "概率估计：<em>p̂ = h_θ(x) = σ(θᵀx)</em> <span class='tag tag-math'>数学</span>" },
+            { text: "Logistic 函数：<em>σ(t) = 1 / (1 + exp(−t))</em> <span class='tag tag-math'>数学</span>", children: [
+              { text: "当 t → +∞ 时，σ(t) → 1" },
+              { text: "当 t → −∞ 时，σ(t) → 0" },
+              { text: "当 t = 0 时，σ(t) = 0.5" },
+              { text: "输出始终在 (0, 1) 之间，可解释为概率" },
+            ]},
+          ]
+        },
+        {
+          text: "3. 预测规则 <span class='tag tag-exam'>考试重点</span>",
+          children: [
+            { text: "完整公式：<em>p̂ = 1 / (1 + exp(−θᵀx))</em> <span class='tag tag-math'>数学</span>" },
+            { text: "预测规则 <span class='tag tag-def'>定义</span>：", children: [
+              { text: "若 p̂ < 0.5，预测 ŷ = 0（负类）" },
+              { text: "若 p̂ ≥ 0.5，预测 ŷ = 1（正类）" },
+            ]},
+            { text: "等价地：当 <em>θᵀx > 0</em> 时预测 1，当 <em>θᵀx < 0</em> 时预测 0" },
+          ]
+        },
+        {
+          text: "4. 代价函数（对数损失 / Log Loss）<span class='tag tag-exam'>考试重点</span>",
+          children: [
+            { text: "目标：找到 θ 使得正类实例获得高概率，负类实例获得低概率" },
+            { text: "单个实例的代价 <span class='tag tag-math'>数学</span>：", children: [
+              { text: "若 y = 1：C(θ) = −log(p̂) — 当 p̂ 接近 1 时代价趋近 0，p̂ 接近 0 时代价趋向 +∞" },
+              { text: "若 y = 0：C(θ) = −log(1 − p̂) — 当 p̂ 接近 0 时代价趋近 0，p̂ 接近 1 时代价趋向 +∞" },
+            ]},
+            { text: "示例验证 <span class='tag tag-case'>案例</span>：", children: [
+              { text: "p̂ = 0.1, y = 1：C = −log(0.1) = 2.30（高代价，模型应给正类更高概率）" },
+              { text: "p̂ = 0.1, y = 0：C = −log(0.9) = 0.10（低代价，正确）" },
+              { text: "p̂ = 0.8, y = 1：C = −log(0.8) = 0.22（低代价，正确）" },
+              { text: "p̂ = 0.8, y = 0：C = −log(0.2) = 1.60（高代价，模型应给负类更低概率）" },
+            ]},
+            { text: "整个训练集的代价函数（Log Loss）<span class='tag tag-math'>数学</span>：", children: [
+              { text: "<em>J(θ) = −(1/m) Σᵢ [y⁽ⁱ⁾ log(p̂⁽ⁱ⁾) + (1 − y⁽ⁱ⁾) log(1 − p̂⁽ⁱ⁾)]</em>" },
+              { text: "对所有实例的对数损失取平均" },
+            ]},
+            { text: "<strong>没有闭式解</strong>，但代价函数是<strong>凸的</strong>，梯度下降保证找到全局最小值 <span class='tag tag-tip'>建议</span>" },
+          ]
+        },
+        {
+          text: "5. Iris 数据集实例 <span class='tag tag-case'>案例</span>",
+          children: [
+            { text: "经典 3 类分类问题：Setosa、Versicolor、Virginica <span class='tag tag-data'>数据</span>" },
+            { text: "4 个特征（均以 cm 计）：萼片长度、萼片宽度、花瓣长度、花瓣宽度" },
+            { text: "二分类示例：Iris-Virginica vs 非 Iris-Virginica", children: [
+              { text: "仅使用花瓣宽度特征：决策边界约在 <strong>1.6 cm</strong> 处 <span class='tag tag-data'>数据</span>" },
+              { text: "宽度 > 1.6 cm → 预测为 Virginica，否则预测为非 Virginica" },
+            ]},
+            { text: "使用两个特征（花瓣长度 + 花瓣宽度）：", children: [
+              { text: "决策边界变为一条<strong>直线</strong>（线性边界）" },
+              { text: "虚线表示 50% 概率的决策边界" },
+            ]},
+          ]
+        },
+      ]
+    },
+    {
+      text: "七、总结与关键要点",
+      children: [
+        {
+          text: "核心概念回顾",
+          children: [
+            { text: "<strong>线性回归</strong>：加权和 + 偏置，用正规方程或梯度下降求解 <span class='tag tag-exam'>考试重点</span>" },
+            { text: "<strong>梯度下降</strong>：迭代优化，三种变体（Batch / SGD / Mini-batch），学习率是关键超参数" },
+            { text: "<strong>多项式回归</strong>：添加高次特征实现非线性拟合，需注意过拟合" },
+            { text: "<strong>学习曲线</strong>：诊断欠拟合（两曲线高且近）vs 过拟合（大间距）的工具" },
+            { text: "<strong>逻辑回归</strong>：用 Sigmoid 函数将线性模型输出映射为概率，用 Log Loss 训练" },
+          ]
+        },
+        {
+          text: "参考资料",
+          children: [
+            { text: "教材：Hands-on Machine Learning with Scikit-Learn & TensorFlow，Aurélien Géron，第 4 章" },
+            { text: "代码：handson-ml3/04_training_linear_models.ipynb <span class='tag tag-code'>代码</span>" },
+          ]
+        },
+      ]
+    },
+  ]
+};
+
+function createNode(item, level) {
+  const node = document.createElement('div');
+  const hasChildren = item.children && item.children.length > 0;
+  node.className = `node level-${level}` + (hasChildren ? '' : ' leaf');
+
+  const header = document.createElement('div');
+  header.className = 'node-header';
+
+  const toggle = document.createElement('span');
+  toggle.className = 'node-toggle';
+  toggle.innerHTML = hasChildren ? '−' : '•';
+
+  const text = document.createElement('span');
+  text.className = 'node-text';
+  text.innerHTML = item.text;
+
+  header.appendChild(toggle);
+  header.appendChild(text);
+  node.appendChild(header);
+
+  if (hasChildren) {
+    const childrenDiv = document.createElement('div');
+    childrenDiv.className = 'node-children';
+    item.children.forEach(child => {
+      childrenDiv.appendChild(createNode(child, level + 1));
+    });
+    node.appendChild(childrenDiv);
+
+    header.addEventListener('click', () => {
+      const isCollapsed = childrenDiv.classList.contains('collapsed');
+      if (isCollapsed) {
+        childrenDiv.classList.remove('collapsed');
+        childrenDiv.style.maxHeight = childrenDiv.scrollHeight + 'px';
+        toggle.innerHTML = '−';
+        setTimeout(() => { childrenDiv.style.maxHeight = 'none'; }, 350);
+      } else {
+        childrenDiv.style.maxHeight = childrenDiv.scrollHeight + 'px';
+        requestAnimationFrame(() => {
+          childrenDiv.classList.add('collapsed');
+          childrenDiv.style.maxHeight = '0';
+        });
+        toggle.innerHTML = '+';
+      }
+    });
+  }
+
+  return node;
+}
+
+const tree = document.getElementById('tree');
+data.children.forEach(child => {
+  tree.appendChild(createNode(child, 0));
+});
+
+function toggleAll(expand) {
+  document.querySelectorAll('.node-children').forEach(el => {
+    if (expand) {
+      el.classList.remove('collapsed');
+      el.style.maxHeight = 'none';
+      el.previousElementSibling.querySelector('.node-toggle').innerHTML = '−';
+    } else {
+      el.classList.add('collapsed');
+      el.style.maxHeight = '0';
+      el.previousElementSibling.querySelector('.node-toggle').innerHTML = '+';
+    }
+  });
+}
+
+function expandLevel(level) {
+  document.querySelectorAll(`.level-${level}`).forEach(node => {
+    const children = node.querySelector('.node-children');
+    if (children) {
+      children.classList.remove('collapsed');
+      children.style.maxHeight = 'none';
+      node.querySelector('.node-toggle').innerHTML = '−';
+    }
+  });
+}
+</script>
+</body>
+</html>
